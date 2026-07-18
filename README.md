@@ -1,7 +1,7 @@
 Pembagian Tugas (5 Anggota)
 👤 Anggota 1 — Auth, User Management & Project Setup (PIC/Koordinator) (zidan)
 
-Setup project: repo, struktur folder Express + React, konfigurasi MongoDB (Atlas/lokal), environment
+Setup project: repo, struktur folder Express + React, konfigurasi MongoDB , environment
 Autentikasi: Register/Login (JWT), hash password (bcrypt)
 Otorisasi: Role-based access control (Admin, Manager, Kasir) — middleware proteksi route
 CRUD User/Karyawan (tambah kasir baru, edit, hapus, nonaktifkan)
