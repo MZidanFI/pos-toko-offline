@@ -1,0 +1,4 @@
+/* Tailwind utilities dipakai oleh modul Master Data Produk (ProdukPage, KategoriPage, SupplierPage). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

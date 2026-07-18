@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* === Design tokens: tema "buku kas / receipt toko" === */
+  --color-bg: #faf6ef;
+  --color-surface: #ffffff;
+  --color-ink: #1c1c1a;
+  --color-muted: #6b6560;
+  --color-line: #e4ddd0;
+
+  --color-primary: #1f4b3f;      /* hijau tua ala buku kas / mesin kasir lama */
+  --color-primary-light: #2d6b58;
+  --color-accent: #e29a3d;       /* amber, warna "stempel lunas" */
+  --color-accent-dark: #c07f27;
+  --color-danger: #c1442e;
+  --color-success: #2d6b48;
+
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-card: 0 1px 2px rgba(28, 28, 26, 0.04), 0 8px 24px rgba(28, 28, 26, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Focus visibility (aksesibilitas) */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* === Layout shell === */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--color-primary);
+  color: #f2ede2;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.sidebar-brand {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sidebar-brand span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: #d8e6de;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-link.active {
+  background: var(--color-accent);
+  color: #241a05;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 16px;
+  font-size: 0.85rem;
+  color: #b9c9c0;
+}
+
+.sidebar-user {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.role-pill {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(226, 154, 61, 0.2);
+  color: var(--color-accent);
+}
+
+.logout-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #f2ede2;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.main-content {
+  flex: 1;
+  padding: 32px 40px;
+  max-width: 1100px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.page-header h1 {
+  font-size: 1.7rem;
+}
+
+/* === Card === */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* === Login page: kartu bergaya struk kasir === */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  background-image: radial-gradient(circle at 20% 20%, rgba(226, 154, 61, 0.08), transparent 40%);
+  padding: 24px;
+}
+
+.receipt-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: 4px 4px var(--radius-md) var(--radius-md);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  position: relative;
+  padding: 34px 30px 28px;
+}
+
+.receipt-card::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-image: radial-gradient(circle, var(--color-primary) 6px, transparent 6.5px);
+  background-size: 20px 12px;
+  background-repeat: repeat-x;
+  background-position: center top;
+}
+
+.receipt-brand {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.receipt-brand .store-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.receipt-brand .store-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed var(--color-line);
+  margin: 20px 0;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-ink);
+}
+
+.form-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  background: #fffdf9;
+  transition: border-color 0.15s ease;
+}
+
+.form-field input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-light);
+}
+
+.btn-primary:active {
+  transform: scale(0.99);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.btn-danger {
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid rgba(193, 68, 46, 0.4);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: rgba(193, 68, 46, 0.08);
+}
+
+.error-banner {
+  background: rgba(193, 68, 46, 0.08);
+  border: 1px solid rgba(193, 68, 46, 0.3);
+  color: var(--color-danger);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.login-hint {
+  margin-top: 18px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+
+/* === Tabel user management === */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.data-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: #fbf7ef;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badge-admin { background: rgba(31, 75, 63, 0.12); color: var(--color-primary); }
+.badge-manager { background: rgba(226, 154, 61, 0.15); color: var(--color-accent-dark); }
+.badge-kasir { background: #eee9dd; color: var(--color-muted); }
+
+.badge-active { background: rgba(45, 107, 72, 0.12); color: var(--color-success); }
+.badge-inactive { background: rgba(193, 68, 46, 0.1); color: var(--color-danger); }
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* === Modal form === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 26, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.modal-box {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 26px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-card);
+}
+
+.modal-box h2 {
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  background: #fffdf9;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
