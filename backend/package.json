@@ -1,22 +1,40 @@
 {
   "name": "pos-backend",
   "version": "1.0.0",
+<<<<<<< HEAD
+  "description": "Backend Point of Sale - Auth & User Management (Anggota 1) + Master Data Produk (Anggota 2)",
+=======
   "description": "Backend Point of Sale - Auth, User Management (Anggota 1)",
+>>>>>>> upstream/main
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
+<<<<<<< HEAD
+    "dev": "nodemon server.js",
+    "seed:admin": "node seed/seedAdmin.js"
+=======
     "dev": "nodemon server.js"
+>>>>>>> upstream/main
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+<<<<<<< HEAD
+    "express-async-errors": "^3.1.1",
+    "express-validator": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1"
+=======
     "express-validator": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.0",
     "morgan": "^1.10.0"
+>>>>>>> upstream/main
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
