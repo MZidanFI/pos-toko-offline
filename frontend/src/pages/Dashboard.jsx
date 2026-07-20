@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +32,13 @@ const QUICK_LINKS = [
 
 export default function Dashboard() {
   const { user, hasRole } = useAuth();
+=======
+import AppLayout from '../components/AppLayout';
+import { useAuth } from '../context/AuthContext';
+
+export default function Dashboard() {
+  const { user } = useAuth();
+>>>>>>> upstream/main
 
   return (
     <AppLayout>
@@ -39,6 +47,7 @@ export default function Dashboard() {
         <h1>Selamat datang, {user?.name}</h1>
       </div>
 
+<<<<<<< HEAD
       <div className="card" style={{ padding: 20, marginBottom: 20 }}>
         <p style={{ margin: 0, color: 'var(--color-muted)' }}>
           Aplikasi POS ini terdiri dari modul <strong>Auth &amp; Manajemen
@@ -69,6 +78,16 @@ export default function Dashboard() {
           </Link>
         ))}
       </div>
+=======
+      <div className="card" style={{ padding: 20 }}>
+        <p style={{ margin: 0, color: 'var(--color-muted)' }}>
+          Modul kasir, produk, dan laporan penjualan akan tampil di sini
+          setelah dikembangkan oleh anggota tim lain. Bagian ini (Anggota 1)
+          menyediakan fondasi autentikasi, otorisasi role, dan manajemen
+          karyawan yang menjadi dasar seluruh modul lainnya.
+        </p>
+      </div>
+>>>>>>> upstream/main
     </AppLayout>
   );
 }

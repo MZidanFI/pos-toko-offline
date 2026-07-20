@@ -4,9 +4,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
+<<<<<<< HEAD
 import ProdukPage from './pages/ProdukPage';
 import KategoriPage from './pages/KategoriPage';
 import SupplierPage from './pages/SupplierPage';
+=======
+>>>>>>> upstream/main
 
 export default function App() {
   return (
@@ -33,6 +36,7 @@ export default function App() {
             }
           />
 
+<<<<<<< HEAD
           <Route
             path="/produk"
             element={
@@ -61,6 +65,9 @@ export default function App() {
           />
 
           {/* Modul lain (Transaksi, Laporan) ditambahkan di sini oleh anggota tim lain */}
+=======
+          {/* Modul lain (Produk, Transaksi, Laporan) ditambahkan di sini oleh anggota tim lain */}
+>>>>>>> upstream/main
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
