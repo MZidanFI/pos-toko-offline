@@ -4,14 +4,10 @@ import { useAuth } from '../context/AuthContext';
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/users', label: 'Manajemen Karyawan', roles: ['Admin', 'Manager'] },
-<<<<<<< HEAD
   { to: '/produk', label: 'Produk', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/kategori', label: 'Kategori', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/supplier', label: 'Supplier', roles: ['Admin', 'Manager', 'Kasir'] },
   // Modul lain (Transaksi, Laporan) akan ditambahkan anggota tim lain
-=======
-  // Modul lain (Produk, Transaksi, Laporan) akan ditambahkan anggota tim lain
->>>>>>> upstream/main
 ];
 
 export default function AppLayout({ children }) {
