@@ -28,6 +28,62 @@
   box-sizing: border-box;
 }
 
+/* === Fix: full-width grid kalau tidak ada form (non-admin) === */
+@media (min-width: 992px) {
+  .crud-grid.crud-grid-single {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* === Fix: header tabel jangan wrap jadi 2 baris === */
+.data-table thead th {
+  white-space: nowrap;
+}
+
+/* === Cetak Struk === */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  body {
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Sembunyikan seluruh aplikasi, sidebar, header, dan tombol */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Hanya card struk yang ditampilkan */
+  .print-area,
+  .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
+    position: fixed !important;
+    top: 12mm !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+
+    width: 120mm !important;
+    max-width: calc(100vw - 24mm) !important;
+
+    margin: 0 !important;
+    padding: 6mm !important;
+
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: 1px solid #cfc8be !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
 html,
 body,
 #root {
@@ -476,4 +532,271 @@ table.data-table {
   padding: 40px 20px;
   color: var(--color-muted);
   font-size: 0.9rem;
+}
+
+/* === Filter bar (search & select filters) === */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.text-input,
+.select-input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  background: #fffdf9;
+  transition: border-color 0.15s ease;
+}
+
+.text-input:focus,
+.select-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.text-input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.select-input {
+  min-width: 160px;
+}
+
+/* === Page header subtitle === */
+.page-header-subtitle {
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+}
+
+/* === Table image thumbnail === */
+.table-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-line);
+}
+
+.table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.table-thumb-empty {
+  font-size: 0.6rem;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+}
+
+/* === Pagination === */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-line);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-ink);
+  transition: background 0.15s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* === CRUD grid (SimpleCrudManager: form + list) === */
+.crud-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 992px) {
+  .crud-grid {
+    grid-template-columns: 320px 1fr;
+  }
+}
+
+.crud-form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  height: fit-content;
+}
+
+.crud-form-card h2 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.form-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  background: #fffdf9;
+  resize: vertical;
+}
+
+.form-field textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.form-actions-inline {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.form-actions-inline .btn-primary {
+  flex: 1;
+  width: auto;
+}
+
+/* === Badge status transaksi === */
+.badge-selesai { background: rgba(45, 107, 72, 0.12); color: var(--color-success); }
+.badge-batal { background: rgba(193, 68, 46, 0.1); color: var(--color-danger); }
+
+.link-action {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.link-action:hover {
+  text-decoration: underline;
+}
+
+.btn-link-danger {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-link-danger:hover {
+  text-decoration: underline;
+}
+
+/* === Modal produk (lebih lebar + grid 2 kolom) === */
+.modal-box-lg {
+  max-width: 640px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--color-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.modal-close-btn:hover {
+  color: var(--color-ink);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+/* === Upload gambar produk === */
+.image-upload-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.image-preview-box {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--color-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+.image-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview-empty {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  text-align: center;
+  padding: 0 8px;
+}
+
+.image-upload-hint {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  margin-top: 6px;
+}
+
+.file-input {
+  font-size: 0.85rem;
+  width: 100%;
 }
