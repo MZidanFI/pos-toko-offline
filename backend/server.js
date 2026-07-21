@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes');
 const produkRoutes = require('./routes/produkRoutes');
 const kategoriRoutes = require('./routes/kategoriRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const transaksiRoutes = require("./routes/transaksiRoutes");
 
 connectDB();
 
@@ -38,6 +39,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/produk', produkRoutes);
 app.use('/api/kategori', kategoriRoutes);
 app.use('/api/supplier', supplierRoutes);
+
+app.use("/api/transaksi", transaksiRoutes);
 
 // TODO: routes modul lain (transaksi, laporan) di-mount di sini oleh anggota tim lain
 

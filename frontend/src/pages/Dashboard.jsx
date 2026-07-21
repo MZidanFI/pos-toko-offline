@@ -4,9 +4,22 @@ import { useAuth } from '../context/AuthContext';
 
 const QUICK_LINKS = [
   {
+    to: '/pos',
+    label: 'Transaksi Baru',
+    desc: 'Buat transaksi penjualan baru',
+    roles: ['Kasir'],
+    highlight: true,
+  },
+  {
+    to: '/transaksi',
+    label: 'Riwayat Transaksi',
+    desc: 'Lihat daftar transaksi & cetak struk',
+    roles: ['Admin', 'Manager', 'Kasir'],
+  },
+  {
     to: '/produk',
     label: 'Master Data Produk',
-    desc: 'Kelola daftar produk, harga, stok, kategori & supplier',
+    desc: 'Kelola produk, harga, stok, kategori & supplier',
     roles: ['Admin', 'Manager', 'Kasir'],
   },
   {
@@ -20,6 +33,12 @@ const QUICK_LINKS = [
     label: 'Supplier',
     desc: 'Kelola data pemasok produk',
     roles: ['Admin', 'Manager', 'Kasir'],
+  },
+  {
+    to: '/laporan',
+    label: 'Laporan Penjualan',
+    desc: 'Laporan transaksi & omzet',
+    roles: ['Admin', 'Manager'],
   },
   {
     to: '/users',
@@ -39,19 +58,17 @@ export default function Dashboard() {
         <h1>Selamat datang, {user?.name}</h1>
       </div>
 
-      <div className="card" style={{ padding: 20, marginBottom: 20 }}>
-        <p style={{ margin: 0, color: 'var(--color-muted)' }}>
-          Aplikasi POS ini terdiri dari modul <strong>Auth &amp; Manajemen
-          Karyawan</strong> serta modul <strong>Master Data Produk</strong>
-          (Produk, Kategori, Supplier). Modul Transaksi &amp; Laporan
-          Penjualan akan menyusul dikembangkan oleh anggota tim lain.
+      <div className="card" style={{ padding: 20, marginBottom: 24 }}>
+        <p style={{ margin: 0, color: 'var(--color-muted)', lineHeight: 1.6 }}>
+          Aplikasi POS ini sudah dilengkapi dengan modul <strong>Transaksi</strong> (Kasir). 
+          Anda dapat melakukan penjualan, melihat riwayat transaksi, dan mencetak struk.
         </p>
       </div>
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
           gap: 16,
         }}
       >
@@ -60,9 +77,16 @@ export default function Dashboard() {
             key={item.to}
             to={item.to}
             className="card"
-            style={{ padding: 20, textDecoration: 'none', color: 'inherit', display: 'block' }}
+            style={{
+              padding: 20,
+              textDecoration: 'none',
+              color: 'inherit',
+              display: 'block',
+              border: item.highlight ? '2px solid var(--color-primary)' : undefined,
+              transition: 'all 0.2s',
+            }}
           >
-            <h3 style={{ margin: '0 0 6px' }}>{item.label}</h3>
+            <h3 style={{ margin: '0 0 8px', fontSize: 18 }}>{item.label}</h3>
             <p style={{ margin: 0, fontSize: 14, color: 'var(--color-muted)' }}>
               {item.desc}
             </p>

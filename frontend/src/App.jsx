@@ -7,6 +7,9 @@ import UserManagement from './pages/UserManagement';
 import ProdukPage from './pages/ProdukPage';
 import KategoriPage from './pages/KategoriPage';
 import SupplierPage from './pages/SupplierPage';
+import Pos from './pages/Pos';
+import RiwayatTransaksi from './pages/RiwayatTransaksi';
+import DetailTransaksi from './pages/DetailTransaksi';
 
 export default function App() {
   return (
@@ -56,6 +59,32 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SupplierPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/pos"
+            element={
+              <ProtectedRoute allowedRoles={['Kasir']}>
+                <Pos />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/transaksi"
+            element={
+              <ProtectedRoute>
+                <RiwayatTransaksi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transaksi/:id"
+            element={
+              <ProtectedRoute>
+                <DetailTransaksi />
               </ProtectedRoute>
             }
           />
