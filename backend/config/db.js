@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB terhubung: ${conn.connection.host}`);
+    console.log(`MongoDB terhubung: ${conn.connection.host}`);
   } catch (err) {
-    console.error(`❌ Gagal konek MongoDB: ${err.message}`);
+    console.error(`Gagal konek MongoDB: ${err.message}`);
     process.exit(1);
   }
 };
