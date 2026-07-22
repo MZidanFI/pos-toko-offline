@@ -1,10 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { useAuth } from '../context/AuthContext';
-import { getDashboardData, getProdukTerlaris, getLabaRugi } from '../api/laporanApi';
-import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import {
+  getDashboardData,
+  getProdukTerlaris,
+  getLabaRugi,
+} from '../api/laporanApi';
+import {
+  DollarSign,
+  ShoppingBag,
+  AlertTriangle,
+  TrendingUp,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts';
 
 const QUICK_LINKS = [
   {
@@ -17,19 +34,19 @@ const QUICK_LINKS = [
   {
     to: '/transaksi',
     label: 'Riwayat Transaksi',
-    desc: 'Lihat daftar transaksi & cetak struk',
+    desc: 'Lihat daftar transaksi dan cetak struk',
     roles: ['Admin', 'Manager', 'Kasir'],
   },
   {
     to: '/produk',
     label: 'Master Data Produk',
-    desc: 'Kelola produk, harga, stok, kategori & supplier',
+    desc: 'Kelola produk, harga, stok, kategori, dan supplier',
     roles: ['Admin', 'Manager', 'Kasir'],
   },
   {
     to: '/kategori',
     label: 'Kategori',
-    desc: 'Kelola kategori produk',
+    desc: 'Kelola kategori produk toko',
     roles: ['Admin', 'Manager', 'Kasir'],
   },
   {
@@ -41,31 +58,32 @@ const QUICK_LINKS = [
   {
     to: '/laporan',
     label: 'Laporan Penjualan',
-    desc: 'Laporan transaksi & omzet',
+    desc: 'Lihat laporan transaksi dan omzet',
     roles: ['Admin', 'Manager'],
   },
   {
     to: '/users',
     label: 'Manajemen Karyawan',
-    desc: 'Kelola akun Admin, Manager & Kasir',
+    desc: 'Kelola akun Admin, Manager, dan Kasir',
     roles: ['Admin', 'Manager'],
   },
   {
     to: '/stok',
     label: 'Manajemen Stok',
-    desc: 'Kelola stok masuk, keluar, dan penyesuaian',
+    desc: 'Catat stok masuk, keluar, dan penyesuaian',
     roles: ['Admin', 'Manager'],
   },
   {
     to: '/customers',
     label: 'Data Customer',
-    desc: 'Kelola data pelanggan dan poin loyalitas',
+    desc: 'Kelola data pelanggan toko',
     roles: ['Admin', 'Manager', 'Kasir'],
   },
 ];
 
 export default function Dashboard() {
   const { user, hasRole } = useAuth();
+
   const [summary, setSummary] = useState(null);
   const [topProducts, setTopProducts] = useState([]);
   const [labaRugi, setLabaRugi] = useState(null);
@@ -78,15 +96,24 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
+
       const [resSummary, resTop, resLaba] = await Promise.all([
         getDashboardData(),
         getProdukTerlaris(),
         getLabaRugi(),
       ]);
 
-      if (resSummary.success) setSummary(resSummary.data);
-      if (resTop.success) setTopProducts(resTop.data);
-      if (resLaba.success) setLabaRugi(resLaba.data);
+      if (resSummary.success) {
+        setSummary(resSummary.data);
+      }
+
+      if (resTop.success) {
+        setTopProducts(resTop.data);
+      }
+
+      if (resLaba.success) {
+        setLabaRugi(resLaba.data);
+      }
     } catch (error) {
       console.error('Gagal memuat data dashboard:', error);
     } finally {
@@ -94,107 +121,292 @@ export default function Dashboard() {
     }
   };
 
-  const formatRupiah = (val) =>
-    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val || 0);
+  const formatRupiah = (value = 0) =>
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(value || 0);
+
+  const formatAngka = (value = 0) =>
+    new Intl.NumberFormat('id-ID').format(value || 0);
+
+  const tanggalHariIni = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
+  const lowStockCount = Number(summary?.lowStockProduk || 0);
+  const LowStockIcon = lowStockCount > 0 ? AlertTriangle : TrendingUp;
+
+  const visibleQuickLinks = QUICK_LINKS.filter((item) =>
+    hasRole(...item.roles)
+  );
 
   return (
     <AppLayout>
-      <div className="page-header">
-        <div className="eyebrow">Ringkasan</div>
+      <div className="page-header dashboard-header">
+        <div className="eyebrow">Ringkasan Toko</div>
         <h1>Selamat datang, {user?.nama || user?.name || 'User'}</h1>
+        <p className="dashboard-date">{tanggalHariIni}</p>
       </div>
 
-      {/* Ringkasan Cards (Modul Anggota 5) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
-          <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-            <DollarSign size={24} />
+      {/* ===== Ringkasan Utama ===== */}
+      <section className="dashboard-summary-grid">
+        <div className="card dashboard-stat dashboard-stat-primary">
+          <div className="dashboard-stat-icon">
+            <DollarSign size={19} strokeWidth={2.2} />
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Total Omzet</p>
-            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : formatRupiah(summary?.omzet)}</h3>
+
+          <div className="dashboard-stat-content">
+            <p className="dashboard-stat-label">Omzet Tercatat</p>
+            <h2 className="dashboard-stat-value">
+              {loading ? '...' : formatRupiah(summary?.omzet)}
+            </h2>
+            <span className="dashboard-stat-caption">
+              Total penjualan yang tercatat
+            </span>
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
-          <div className="p-3 bg-green-100 text-green-600 rounded-lg">
-            <ShoppingBag size={24} />
+        <div className="card dashboard-stat">
+          <div className="dashboard-stat-icon dashboard-stat-icon-success">
+            <ShoppingBag size={18} strokeWidth={2.2} />
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Total Transaksi</p>
-            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : summary?.totalTransaksi || 0}</h3>
+
+          <div className="dashboard-stat-content">
+            <p className="dashboard-stat-label">Transaksi</p>
+            <h2 className="dashboard-stat-value">
+              {loading ? '...' : formatAngka(summary?.totalTransaksi)}
+            </h2>
+            <span className="dashboard-stat-caption">
+              Transaksi berhasil dicatat
+            </span>
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
-          <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
-            <TrendingUp size={24} />
+        <div className="card dashboard-stat">
+          <div className="dashboard-stat-icon dashboard-stat-icon-accent">
+            <TrendingUp size={18} strokeWidth={2.2} />
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Laba Kotor</p>
-            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : formatRupiah(labaRugi?.labaKotor)}</h3>
+
+          <div className="dashboard-stat-content">
+            <p className="dashboard-stat-label">Laba Kotor</p>
+            <h2 className="dashboard-stat-value">
+              {loading ? '...' : formatRupiah(labaRugi?.labaKotor)}
+            </h2>
+            <span className="dashboard-stat-caption">
+              Perkiraan laba dari penjualan
+            </span>
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
-          <div className="p-3 bg-amber-100 text-amber-600 rounded-lg">
-            <AlertTriangle size={24} />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Stok Menipis (≤5)</p>
-            <h3 className="text-lg font-bold text-amber-600">{loading ? '...' : summary?.lowStockProduk || 0} Produk</h3>
-          </div>
-        </div>
-      </div>
-
-      {/* Grafik Top Produk (Modul Anggota 5) */}
-      <div className="p-5 bg-white rounded-xl shadow-sm border mb-8">
-        <h2 className="text-base font-semibold text-gray-800 mb-4">Top 10 Produk Terlaris</h2>
-        {topProducts.length > 0 ? (
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={topProducts}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="nama" tick={{ fontSize: 12 }} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="totalQty" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Terjual (Qty)" />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <p className="text-sm text-gray-500 text-center py-6">Belum ada data transaksi penjualan.</p>
-        )}
-      </div>
-
-      {/* Quick Links Navigasi Bawaan */}
-      <h2 className="text-lg font-bold text-gray-800 mb-4">Akses Cepat Menu</h2>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 16,
-        }}
-      >
-        {QUICK_LINKS.filter((item) => hasRole(...item.roles)).map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="card"
-            style={{
-              padding: 20,
-              textDecoration: 'none',
-              color: 'inherit',
-              display: 'block',
-              border: item.highlight ? '2px solid var(--color-primary)' : undefined,
-              transition: 'all 0.2s',
-            }}
+        <div
+          className={`card dashboard-stat ${
+            lowStockCount > 0 ? 'dashboard-stat-warning' : ''
+          }`}
+        >
+          <div
+            className={`dashboard-stat-icon ${
+              lowStockCount > 0
+                ? 'dashboard-stat-icon-warning'
+                : 'dashboard-stat-icon-success'
+            }`}
           >
-            <h3 style={{ margin: '0 0 8px', fontSize: 18 }}>{item.label}</h3>
-            <p style={{ margin: 0, fontSize: 14, color: 'var(--color-muted)' }}>
-              {item.desc}
-            </p>
-          </Link>
-        ))}
-      </div>
+            <LowStockIcon size={18} strokeWidth={2.2} />
+          </div>
+
+          <div className="dashboard-stat-content">
+            <p className="dashboard-stat-label">Stok Menipis</p>
+            <h2
+              className={`dashboard-stat-value ${
+                lowStockCount > 0 ? 'dashboard-warning-value' : ''
+              }`}
+            >
+              {loading
+                ? '...'
+                : lowStockCount > 0
+                ? `${lowStockCount} Produk`
+                : 'Aman'}
+            </h2>
+            <span className="dashboard-stat-caption">
+              Produk dengan stok ≤ 5
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Grafik dan Perhatian ===== */}
+      <section className="dashboard-insight-grid">
+        <div className="card dashboard-panel dashboard-chart-panel">
+          <div className="dashboard-panel-header">
+            <div>
+              <div className="dashboard-panel-eyebrow">Penjualan</div>
+              <h2 className="dashboard-panel-title">
+                Produk Terlaris
+              </h2>
+            </div>
+
+            <span className="dashboard-panel-note">
+              Berdasarkan jumlah produk terjual
+            </span>
+          </div>
+
+          {loading ? (
+            <div className="empty-state">
+              Memuat data produk terlaris...
+            </div>
+          ) : topProducts.length > 0 ? (
+            <div className="dashboard-chart-wrap">
+              <ResponsiveContainer width="100%" height={270}>
+                <BarChart
+                  data={topProducts}
+                  margin={{
+                    top: 10,
+                    right: 8,
+                    left: -18,
+                    bottom: 0,
+                  }}
+                >
+                  <CartesianGrid
+                    stroke="var(--color-line)"
+                    strokeDasharray="3 3"
+                    vertical={false}
+                  />
+
+                  <XAxis
+                    dataKey="nama"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fill: '#6b6560',
+                      fontSize: 11,
+                    }}
+                  />
+
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    allowDecimals={false}
+                    tick={{
+                      fill: '#6b6560',
+                      fontSize: 11,
+                    }}
+                  />
+
+                  <Tooltip
+                    cursor={{
+                      fill: 'rgba(31, 75, 63, 0.06)',
+                    }}
+                    contentStyle={{
+                      background: '#fffdf9',
+                      border: '1px solid #e4ddd0',
+                      borderRadius: '6px',
+                      boxShadow:
+                        '0 8px 20px rgba(28, 28, 26, 0.08)',
+                      fontSize: '0.82rem',
+                    }}
+                    labelStyle={{
+                      color: '#1c1c1a',
+                      fontWeight: 600,
+                    }}
+                    formatter={(value) => [
+                      `${formatAngka(value)} qty`,
+                      'Terjual',
+                    ]}
+                  />
+
+                  <Bar
+                    dataKey="totalQty"
+                    fill="#1f4b3f"
+                    radius={[4, 4, 0, 0]}
+                    name="Terjual"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="empty-state">
+              Belum ada transaksi penjualan untuk ditampilkan.
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`card dashboard-stock-note ${
+            lowStockCount > 0 ? 'has-warning' : 'is-safe'
+          }`}
+        >
+          <div className="dashboard-stock-note-icon">
+            <LowStockIcon size={22} strokeWidth={2.1} />
+          </div>
+
+          <div className="dashboard-panel-eyebrow">
+            Persediaan
+          </div>
+
+          <h2 className="dashboard-stock-note-title">
+            {loading
+              ? 'Memeriksa stok...'
+              : lowStockCount > 0
+              ? 'Stok Perlu Perhatian'
+              : 'Stok Dalam Kondisi Aman'}
+          </h2>
+
+          <p className="dashboard-stock-note-text">
+            {loading
+              ? 'Data stok produk sedang dimuat.'
+              : lowStockCount > 0
+              ? `${lowStockCount} produk memiliki stok tersisa lima atau kurang. Periksa persediaan agar penjualan tidak terganggu.`
+              : 'Tidak ada produk dengan stok kritis saat ini.'}
+          </p>
+
+          {hasRole('Admin', 'Manager') && (
+            <Link to="/stok" className="dashboard-stock-link">
+              Buka Manajemen Stok <span>→</span>
+            </Link>
+          )}
+        </div>
+      </section>
+
+      {/* ===== Akses Cepat ===== */}
+      <section className="dashboard-shortcut-section">
+        <div className="dashboard-section-header">
+          <div>
+            <div className="dashboard-panel-eyebrow">Navigasi</div>
+            <h2 className="dashboard-section-title">Akses Cepat</h2>
+          </div>
+
+          <p className="dashboard-section-desc">
+            Pilih menu untuk melanjutkan pekerjaan.
+          </p>
+        </div>
+
+        <div className="dashboard-quick-grid">
+          {visibleQuickLinks.map((item, index) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`card dashboard-quick-link ${
+                item.highlight ? 'dashboard-quick-link-highlight' : ''
+              }`}
+            >
+              <span className="dashboard-quick-number">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <div className="dashboard-quick-content">
+                <h3 className="dashboard-quick-title">{item.label}</h3>
+                <p className="dashboard-quick-desc">{item.desc}</p>
+              </div>
+
+              <span className="dashboard-quick-arrow">→</span>
+            </Link>
+          ))}
+        </div>
+      </section>
     </AppLayout>
   );
 }
