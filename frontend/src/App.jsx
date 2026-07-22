@@ -11,7 +11,6 @@ import Pos from './pages/Pos';
 import RiwayatTransaksi from './pages/RiwayatTransaksi';
 import DetailTransaksi from './pages/DetailTransaksi';
 import StokPage from './pages/StokPage';
-import CustomerPage from "./pages/CustomerPage";
 import LaporanPage from './pages/LaporanPage';
 
 export default function App() {
@@ -97,15 +96,6 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
                 <StokPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/customers"
-            element={
-              <ProtectedRoute>
-                <CustomerPage />
               </ProtectedRoute>
             }
           />

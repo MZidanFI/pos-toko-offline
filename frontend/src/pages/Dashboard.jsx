@@ -7,12 +7,7 @@ import {
   getProdukTerlaris,
   getLabaRugi,
 } from '../api/laporanApi';
-import {
-  DollarSign,
-  ShoppingBag,
-  AlertTriangle,
-  TrendingUp,
-} from 'lucide-react';
+import { TrendingUp, AlertTriangle } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -72,12 +67,6 @@ const QUICK_LINKS = [
     label: 'Manajemen Stok',
     desc: 'Catat stok masuk, keluar, dan penyesuaian',
     roles: ['Admin', 'Manager'],
-  },
-  {
-    to: '/customers',
-    label: 'Data Customer',
-    desc: 'Kelola data pelanggan toko',
-    roles: ['Admin', 'Manager', 'Kasir'],
   },
 ];
 
@@ -154,12 +143,9 @@ export default function Dashboard() {
       </div>
 
       {/* ===== Ringkasan Utama ===== */}
+      {hasRole('Admin', 'Manager') && (
       <section className="dashboard-summary-grid">
         <div className="card dashboard-stat dashboard-stat-primary">
-          <div className="dashboard-stat-icon">
-            <DollarSign size={19} strokeWidth={2.2} />
-          </div>
-
           <div className="dashboard-stat-content">
             <p className="dashboard-stat-label">Omzet Tercatat</p>
             <h2 className="dashboard-stat-value">
@@ -172,10 +158,6 @@ export default function Dashboard() {
         </div>
 
         <div className="card dashboard-stat">
-          <div className="dashboard-stat-icon dashboard-stat-icon-success">
-            <ShoppingBag size={18} strokeWidth={2.2} />
-          </div>
-
           <div className="dashboard-stat-content">
             <p className="dashboard-stat-label">Transaksi</p>
             <h2 className="dashboard-stat-value">
@@ -188,10 +170,6 @@ export default function Dashboard() {
         </div>
 
         <div className="card dashboard-stat">
-          <div className="dashboard-stat-icon dashboard-stat-icon-accent">
-            <TrendingUp size={18} strokeWidth={2.2} />
-          </div>
-
           <div className="dashboard-stat-content">
             <p className="dashboard-stat-label">Laba Kotor</p>
             <h2 className="dashboard-stat-value">
@@ -208,16 +186,6 @@ export default function Dashboard() {
             lowStockCount > 0 ? 'dashboard-stat-warning' : ''
           }`}
         >
-          <div
-            className={`dashboard-stat-icon ${
-              lowStockCount > 0
-                ? 'dashboard-stat-icon-warning'
-                : 'dashboard-stat-icon-success'
-            }`}
-          >
-            <LowStockIcon size={18} strokeWidth={2.2} />
-          </div>
-
           <div className="dashboard-stat-content">
             <p className="dashboard-stat-label">Stok Menipis</p>
             <h2
@@ -237,9 +205,11 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ===== Grafik dan Perhatian ===== */}
       <section className="dashboard-insight-grid">
+        {hasRole('Admin', 'Manager') && (
         <div className="card dashboard-panel dashboard-chart-panel">
           <div className="dashboard-panel-header">
             <div>
@@ -333,6 +303,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        )}
 
         <div
           className={`card dashboard-stock-note ${
