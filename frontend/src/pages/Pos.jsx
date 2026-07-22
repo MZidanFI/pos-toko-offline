@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import api from '../api/axiosConfig';
@@ -18,6 +18,76 @@ const METODE_OPTIONS = [
   { value: 'transfer', label: 'Transfer' },
 ];
 
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const selected = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="custom-select" ref={wrapperRef}>
+      <button
+        type="button"
+        className="custom-select-button"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className="custom-select-label">
+          {selected ? selected.label : placeholder}
+        </span>
+        <span className="custom-select-arrow">▾</span>
+      </button>
+
+      {open && (
+        <div className="custom-select-menu">
+          {placeholder && (
+            <button
+              type="button"
+              className={`custom-select-option empty ${!value ? 'active' : ''}`}
+              onClick={() => {
+                onChange('');
+                setOpen(false);
+              }}
+            >
+              {placeholder}
+            </button>
+          )}
+
+          {options.length === 0 ? (
+            <button type="button" className="custom-select-option" disabled>
+              Tidak ada data
+            </button>
+          ) : (
+            options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`custom-select-option ${value === opt.value ? 'active' : ''}`}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Pos() {
   const navigate = useNavigate();
 
@@ -35,22 +105,23 @@ export default function Pos() {
   const [error, setError] = useState('');
   const [struk, setStruk] = useState(null);
 
-  const [toast, setToast] = useState(null);
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500); // Hilang otomatis setelah 3.5 detik
-  };
-
   useEffect(() => {
     if (!query.trim()) {
       setHasilCari([]);
       return;
     }
+
     setMencari(true);
+
     const timer = setTimeout(async () => {
       try {
-        const res = await api.get('/produk', { params: { search: query.trim(), limit: 8 } });
+        const res = await api.get('/produk', {
+          params: {
+            search: query.trim(),
+            limit: 8,
+          },
+        });
+
         setHasilCari(res.data.data || []);
       } catch (err) {
         console.error(err);
@@ -58,19 +129,24 @@ export default function Pos() {
         setMencari(false);
       }
     }, 400);
+
     return () => clearTimeout(timer);
   }, [query]);
 
   const tambahKeKeranjang = (produk) => {
     setCart((prev) => {
       const existing = prev.find((it) => it._id === produk._id);
+
       if (existing) {
         if (existing.qty >= produk.stok) return prev;
+
         return prev.map((it) =>
           it._id === produk._id ? { ...it, qty: it.qty + 1 } : it
         );
       }
+
       if (produk.stok < 1) return prev;
+
       return [
         ...prev,
         {
@@ -83,6 +159,7 @@ export default function Pos() {
         },
       ];
     });
+
     setQuery('');
     setHasilCari([]);
   };
@@ -91,7 +168,8 @@ export default function Pos() {
     setCart((prev) =>
       prev.map((it) => {
         if (it._id !== id) return it;
-        const qtyBaru = Math.max(1, Math.min(qty, it.stok));
+
+        const qtyBaru = Math.max(1, Math.min(qty || 1, it.stok));
         return { ...it, qty: qtyBaru };
       })
     );
@@ -113,11 +191,13 @@ export default function Pos() {
   useEffect(() => {
     if (metodePembayaran !== 'tunai') {
       setJumlahBayar(total);
+    } else {
+      setJumlahBayar('');
     }
   }, [metodePembayaran, total]);
 
   const kembalian =
-    metodePembayaran === 'tunai' && jumlahBayar
+    metodePembayaran === 'tunai' && jumlahBayar !== ''
       ? Number(jumlahBayar) - total
       : 0;
 
@@ -132,24 +212,31 @@ export default function Pos() {
 
   const handleBayar = async () => {
     setError('');
+
     if (cart.length === 0) {
       setError('Keranjang masih kosong');
       return;
     }
+
     if (metodePembayaran === 'tunai' && Number(jumlahBayar) < total) {
       setError('Jumlah bayar kurang dari total transaksi');
       return;
     }
 
     setSubmitting(true);
+
     try {
       const payload = {
-        items: cart.map((it) => ({ produk: it._id, qty: it.qty })),
+        items: cart.map((it) => ({
+          produk: it._id,
+          qty: it.qty,
+        })),
         diskon: Number(diskon || 0),
         pajakPersen: Number(pajakPersen || 0),
         metodePembayaran,
         jumlahBayar: Number(jumlahBayar || total),
       };
+
       const res = await api.post('/transaksi', payload);
       setStruk(res.data);
       resetForm();
@@ -170,117 +257,209 @@ export default function Pos() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1.4fr 1fr',
+          gridTemplateColumns: 'minmax(0, 1.4fr) minmax(340px, 1fr)',
           gap: 20,
           alignItems: 'start',
         }}
       >
         {/* KIRI */}
         <div>
-          <div className="card" style={{ padding: 16, marginBottom: 16, position: 'relative' }}>
+          <div
+            className="card"
+            style={{
+              padding: 16,
+              marginBottom: 16,
+              position: 'relative',
+            }}
+          >
             <input
               type="text"
+              className="text-input"
               placeholder="Cari produk berdasarkan nama atau SKU..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                borderRadius: 8,
-                border: '1px solid var(--color-border)',
-                fontSize: 15,
+                minWidth: 0,
               }}
             />
+
             {mencari && (
-              <div style={{ fontSize: 13, color: 'var(--color-muted)', marginTop: 6 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'var(--color-muted)',
+                  marginTop: 8,
+                }}
+              >
                 Mencari...
               </div>
             )}
+
             {hasilCari.length > 0 && (
               <div
                 className="card"
                 style={{
                   position: 'absolute',
                   top: '100%',
-                  left: 0,
-                  right: 0,
-                  zIndex: 10,
-                  marginTop: 4,
+                  left: 16,
+                  right: 16,
+                  zIndex: 90,
+                  marginTop: 6,
                   maxHeight: 300,
                   overflowY: 'auto',
                   padding: 8,
                 }}
               >
                 {hasilCari.map((p) => (
-                  <div
+                  <button
                     key={p._id}
+                    type="button"
                     onClick={() => p.stok >= 1 && tambahKeKeranjang(p)}
+                    disabled={p.stok < 1}
                     style={{
+                      width: '100%',
                       padding: '10px 12px',
-                      borderRadius: 6,
+                      borderRadius: 'var(--radius-sm)',
                       cursor: p.stok < 1 ? 'not-allowed' : 'pointer',
                       opacity: p.stok < 1 ? 0.5 : 1,
                       display: 'flex',
                       justifyContent: 'space-between',
+                      gap: 12,
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--color-ink)',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#fbf7ef';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
                     }}
                   >
                     <div>
                       <strong>{p.nama}</strong>
-                      <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--color-muted)',
+                          marginTop: 2,
+                        }}
+                      >
                         SKU: {p.sku} · Stok: {p.stok}
                       </div>
                     </div>
-                    <div>{formatRupiah(p.hargaJual)}</div>
-                  </div>
+
+                    <div style={{ fontWeight: 600 }}>
+                      {formatRupiah(p.hargaJual)}
+                    </div>
+                  </button>
                 ))}
               </div>
             )}
           </div>
 
           <div className="card" style={{ padding: 16 }}>
-            <h3 style={{ marginTop: 0 }}>Keranjang</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: 14 }}>
+              Keranjang
+            </h3>
+
             {cart.length === 0 ? (
-              <p style={{ color: 'var(--color-muted)' }}>Belum ada item.</p>
+              <div className="empty-state" style={{ padding: '28px 16px' }}>
+                Belum ada item.
+              </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <table className="data-table">
                 <thead>
-                  <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>
-                    <th style={{ padding: 8 }}>Produk</th>
-                    <th style={{ padding: 8 }}>Harga</th>
-                    <th style={{ padding: 8, width: 110 }}>Qty</th>
-                    <th style={{ padding: 8 }}>Subtotal</th>
-                    <th style={{ padding: 8 }}></th>
+                  <tr>
+                    <th>Produk</th>
+                    <th>Harga</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {cart.map((it) => (
-                    <tr key={it._id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                      <td style={{ padding: 8 }}>
-                        <div>{it.nama}</div>
-                        <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+                    <tr key={it._id}>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{it.nama}</div>
+                        <div
+                          className="mono"
+                          style={{
+                            fontSize: 12,
+                            color: 'var(--color-muted)',
+                            marginTop: 2,
+                          }}
+                        >
                           SKU: {it.sku}
                         </div>
                       </td>
-                      <td style={{ padding: 8 }}>{formatRupiah(it.harga)}</td>
-                      <td style={{ padding: 8 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <button onClick={() => ubahQty(it._id, it.qty - 1)}>-</button>
+
+                      <td>{formatRupiah(it.harga)}</td>
+
+                      <td>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => ubahQty(it._id, it.qty - 1)}
+                            style={{
+                              padding: '4px 8px',
+                              minWidth: 28,
+                            }}
+                          >
+                            -
+                          </button>
+
                           <input
                             type="number"
                             value={it.qty}
                             min={1}
                             max={it.stok}
                             onChange={(e) => ubahQty(it._id, Number(e.target.value))}
-                            style={{ width: 45, textAlign: 'center' }}
+                            style={{
+                              width: 48,
+                              textAlign: 'center',
+                              padding: '6px 4px',
+                              border: '1px solid var(--color-line)',
+                              borderRadius: 'var(--radius-sm)',
+                              background: '#fffdf9',
+                              fontFamily: 'var(--font-body)',
+                            }}
                           />
-                          <button onClick={() => ubahQty(it._id, it.qty + 1)}>+</button>
+
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => ubahQty(it._id, it.qty + 1)}
+                            style={{
+                              padding: '4px 8px',
+                              minWidth: 28,
+                            }}
+                          >
+                            +
+                          </button>
                         </div>
                       </td>
-                      <td style={{ padding: 8 }}>{formatRupiah(it.harga * it.qty)}</td>
-                      <td style={{ padding: 8 }}>
+
+                      <td style={{ fontWeight: 600 }}>
+                        {formatRupiah(it.harga * it.qty)}
+                      </td>
+
+                      <td>
                         <button
+                          type="button"
+                          className="btn-link-danger"
                           onClick={() => hapusItem(it._id)}
-                          style={{ color: 'crimson', border: 'none', background: 'none', cursor: 'pointer' }}
                         >
                           Hapus
                         </button>
@@ -295,72 +474,79 @@ export default function Pos() {
 
         {/* KANAN */}
         <div className="card" style={{ padding: 16 }}>
-          <h3 style={{ marginTop: 0 }}>Pembayaran</h3>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: 14 }}>
+            Pembayaran
+          </h3>
 
-          <div style={{ marginBottom: 10 }}>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Diskon (Rp)</label>
+          <div className="form-field">
+            <label>Diskon (Rp)</label>
             <input
               type="number"
               value={diskon}
               onChange={(e) => setDiskon(e.target.value)}
-              style={{ width: '100%', padding: 8, border: '1px solid var(--color-border)', borderRadius: 6 }}
               min={0}
             />
           </div>
 
-          <div style={{ marginBottom: 10 }}>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Pajak (%)</label>
+          <div className="form-field">
+            <label>Pajak (%)</label>
             <input
               type="number"
               value={pajakPersen}
               onChange={(e) => setPajakPersen(e.target.value)}
-              style={{ width: '100%', padding: 8, border: '1px solid var(--color-border)', borderRadius: 6 }}
               min={0}
             />
           </div>
 
-          <div style={{ marginBottom: 10 }}>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Metode Pembayaran</label>
-            <select
+          <div className="form-field">
+            <label>Metode Pembayaran</label>
+            <CustomSelect
               value={metodePembayaran}
-              onChange={(e) => setMetodePembayaran(e.target.value)}
-              style={{ width: '100%', padding: 8, border: '1px solid var(--color-border)', borderRadius: 6 }}
-            >
-              {METODE_OPTIONS.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
+              placeholder="Pilih metode pembayaran"
+              options={METODE_OPTIONS}
+              onChange={(value) => {
+                if (!value) return;
+                setMetodePembayaran(value);
+              }}
+            />
           </div>
 
           {metodePembayaran === 'tunai' && (
-            <div style={{ marginBottom: 10 }}>
-              <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Jumlah Bayar</label>
+            <div className="form-field">
+              <label>Jumlah Bayar</label>
               <input
                 type="number"
                 value={jumlahBayar}
                 onChange={(e) => setJumlahBayar(e.target.value)}
-                style={{ width: '100%', padding: 8, border: '1px solid var(--color-border)', borderRadius: 6 }}
                 min={0}
+                placeholder="Masukkan jumlah bayar"
               />
             </div>
           )}
 
-          <hr style={{ margin: '16px 0', borderColor: 'var(--color-border)' }} />
+          <hr
+            style={{
+              margin: '16px 0',
+              border: 'none',
+              borderTop: '1px solid var(--color-line)',
+            }}
+          />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span>Subtotal</span>
             <span>{formatRupiah(subtotal)}</span>
           </div>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span>Diskon</span>
             <span>- {formatRupiah(diskon)}</span>
           </div>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span>Pajak ({pajakPersen}%)</span>
             <span>{formatRupiah(pajak)}</span>
           </div>
+
           <div
             style={{
               display: 'flex',
@@ -375,30 +561,33 @@ export default function Pos() {
           </div>
 
           {metodePembayaran === 'tunai' && jumlahBayar !== '' && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: 8,
+              }}
+            >
               <span>Kembalian</span>
-              <span style={{ color: kembalian < 0 ? 'crimson' : 'green' }}>
+              <span style={{ color: kembalian < 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
                 {formatRupiah(kembalian)}
               </span>
             </div>
           )}
 
-          {error && <div style={{ color: 'crimson', marginTop: 10, fontSize: 14 }}>{error}</div>}
+          {error && (
+            <div className="error-banner" style={{ marginTop: 14, marginBottom: 0 }}>
+              {error}
+            </div>
+          )}
 
           <button
+            type="button"
+            className="btn-primary"
             onClick={handleBayar}
             disabled={submitting || cart.length === 0}
             style={{
-              width: '100%',
-              padding: 12,
               marginTop: 16,
-              background: 'var(--color-primary)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 16,
-              cursor: 'pointer',
-              opacity: submitting ? 0.7 : 1,
             }}
           >
             {submitting ? 'Memproses...' : 'Bayar'}
@@ -407,55 +596,93 @@ export default function Pos() {
       </div>
 
       {struk && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-          }}
-        >
-          <div className="card" style={{ padding: 24, width: 380, maxHeight: '85vh', overflowY: 'auto' }}>
-            <h3 style={{ textAlign: 'center', marginTop: 0 }}>Transaksi Berhasil</h3>
-            <p style={{ textAlign: 'center', fontWeight: 700 }}>{struk.nomorStruk}</p>
-            <hr style={{ borderColor: 'var(--color-border)' }} />
+        <div className="modal-overlay" onClick={() => setStruk(null)}>
+          <div
+            className="modal-box"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 420,
+              maxHeight: '85vh',
+              overflowY: 'auto',
+            }}
+          >
+            <h2 style={{ textAlign: 'center' }}>Transaksi Berhasil</h2>
+
+            <p
+              className="mono"
+              style={{
+                textAlign: 'center',
+                fontWeight: 700,
+                marginTop: -8,
+                marginBottom: 16,
+              }}
+            >
+              {struk.nomorStruk}
+            </p>
+
+            <hr
+              style={{
+                border: 'none',
+                borderTop: '1px solid var(--color-line)',
+                marginBottom: 14,
+              }}
+            />
+
             {struk.items.map((it, idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 4 }}>
-                <span>{it.nama} x{it.qty}</span>
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: 14,
+                  marginBottom: 6,
+                  gap: 12,
+                }}
+              >
+                <span>
+                  {it.nama} x{it.qty}
+                </span>
                 <span>{formatRupiah(it.subtotal)}</span>
               </div>
             ))}
-            <hr style={{ borderColor: 'var(--color-border)' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+            <hr
+              style={{
+                border: 'none',
+                borderTop: '1px solid var(--color-line)',
+                margin: '14px 0',
+              }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span>Total</span>
               <strong>{formatRupiah(struk.total)}</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span>Bayar</span>
               <span>{formatRupiah(struk.jumlahBayar)}</span>
             </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Kembali</span>
               <span>{formatRupiah(struk.kembalian)}</span>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-              <button onClick={() => navigate(`/transaksi/${struk._id}`)} style={{ flex: 1, padding: 10 }}>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => navigate(`/transaksi/${struk._id}`)}
+              >
                 Lihat Detail
               </button>
+
               <button
+                type="button"
+                className="btn-primary"
+                style={{ width: 'auto' }}
                 onClick={() => setStruk(null)}
-                style={{
-                  flex: 1,
-                  padding: 10,
-                  background: 'var(--color-primary)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                }}
               >
                 Transaksi Baru
               </button>
