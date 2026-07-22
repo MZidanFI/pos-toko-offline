@@ -11,7 +11,6 @@ import Pos from './pages/Pos';
 import RiwayatTransaksi from './pages/RiwayatTransaksi';
 import DetailTransaksi from './pages/DetailTransaksi';
 import StokPage from './pages/StokPage';
-import CustomerPage from "./pages/CustomerPage";
 
 export default function App() {
   return (
@@ -99,13 +98,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-          <Route path="/customers"
-          element={
-            <ProtectedRoute>
-              <CustomerPage />
-            </ProtectedRoute>}
-            />
 
           {/* Modul lain (Transaksi, Laporan) ditambahkan di sini oleh anggota tim lain */}
 

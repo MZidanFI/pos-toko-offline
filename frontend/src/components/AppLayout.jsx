@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/produk', label: 'Produk', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/kategori', label: 'Kategori', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/supplier', label: 'Supplier', roles: ['Admin', 'Manager', 'Kasir'] },
+  { to: '/stok', label: 'Manajemen Stok', roles: ['Admin', 'Manager', 'Kasir'] },
   // Modul lain (Transaksi, Laporan) akan ditambahkan anggota tim lain
 ];
 

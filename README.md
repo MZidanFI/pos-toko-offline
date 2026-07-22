@@ -162,7 +162,6 @@ Ini modul paling krusial → alur bisnis utama toko
 Model MongoDB: Stok/Inventory, Customer/Member
 CRUD Stok: stok masuk (dari supplier), stok keluar, adjustment stok, histori pergerakan stok
 Notifikasi/alert stok menipis (low stock warning)
-CRUD Customer/Member (opsional: sistem poin/diskon member)
 Halaman React: manajemen stok, riwayat stok masuk/keluar, manajemen customer
 
 👤 Anggota 5 — Laporan, Dashboard & QA (rois)

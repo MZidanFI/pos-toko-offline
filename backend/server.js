@@ -14,7 +14,6 @@ const kategoriRoutes = require('./routes/kategoriRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const transaksiRoutes = require("./routes/transaksiRoutes");
 const stokRoutes = require("./routes/stokRoutes"); // Import routes stok
-const customerRoutes = require("./routes/customerRoutes");   // Import routes customer
 
 connectDB();
 
@@ -46,7 +45,6 @@ app.use("/api/transaksi", transaksiRoutes);
 
 // Routes Anggota 4: Manajemen Stok & Customer
 app.use('/api/stok', stokRoutes);
-app.use('/api/customers', customerRoutes);
 
 // TODO: routes modul lain (transaksi, laporan) di-mount di sini oleh anggota tim lain
 
