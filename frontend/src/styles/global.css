@@ -891,18 +891,15 @@ table.data-table {
 /* === Custom Select Tema Kasirin                 === */
 /* ================================================ */
 
+/* === Custom Select Tema Kasirin - Final === */
 .custom-select {
   position: relative;
   width: 100%;
 }
 
 .custom-select-button {
-  display: flex;
   width: 100%;
   min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
   padding: 10px 12px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
@@ -910,55 +907,81 @@ table.data-table {
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: 0.9rem;
+  line-height: 1.2;
   text-align: left;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  box-shadow: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 .custom-select-button:hover {
   border-color: rgba(31, 75, 63, 0.45);
+  background: #fffaf1;
 }
 
-.custom-select-button:focus {
+.custom-select-button:focus,
+.custom-select-button:focus-visible {
   border-color: var(--color-primary);
-  outline: none;
   box-shadow: 0 0 0 3px rgba(31, 75, 63, 0.12);
+  outline: none;
 }
 
 .custom-select-label {
+  display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .custom-select-arrow {
-  flex-shrink: 0;
   color: var(--color-muted);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .custom-select-menu {
   position: absolute;
-  z-index: 40;
-  top: calc(100% + 5px);
-  right: 0;
+  top: calc(100% + 4px);
   left: 0;
-  max-height: 220px;
-  overflow-y: auto;
+  right: 0;
+  z-index: 150;
+
+  background: #fffdf9;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
-  background: #fffdf9;
   box-shadow: var(--shadow-card);
+
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
 }
 
 .custom-select-option {
   width: 100%;
   padding: 10px 12px;
   border: none;
+  border-radius: 0;
   background: #fffdf9;
   color: var(--color-ink);
+
   font-family: var(--font-body);
   font-size: 0.9rem;
+  line-height: 1.2;
   text-align: left;
+
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .custom-select-option:hover {
@@ -968,16 +991,23 @@ table.data-table {
 .custom-select-option.active {
   background: var(--color-primary);
   color: #ffffff;
+  font-weight: 600;
 }
 
 .custom-select-option.empty {
   color: var(--color-muted);
 }
 
+.custom-select-option.empty.active {
+  background: #eee9dd;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
 .custom-select-option:disabled {
   cursor: not-allowed;
-  background: #f6f1e8;
   color: var(--color-muted);
+  background: #f6f1e8;
 }
 
 /* ================================================ */

@@ -1,9 +1,79 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 
 const EMPTY_FORM = { name: '', email: '', password: '', role: 'Kasir', phone: '' };
+
+const ROLE_OPTIONS = [
+  { value: 'Kasir', label: 'Kasir' },
+  { value: 'Manager', label: 'Manager' },
+  { value: 'Admin', label: 'Admin' },
+];
+
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const selected = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="custom-select" ref={wrapperRef}>
+      <button
+        type="button"
+        className="custom-select-button"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className="custom-select-label">
+          {selected ? selected.label : placeholder}
+        </span>
+        <span className="custom-select-arrow">▾</span>
+      </button>
+
+      {open && (
+        <div className="custom-select-menu">
+          {placeholder && (
+            <button
+              type="button"
+              className={`custom-select-option empty ${!value ? 'active' : ''}`}
+              onClick={() => {
+                onChange('');
+                setOpen(false);
+              }}
+            >
+              {placeholder}
+            </button>
+          )}
+
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`custom-select-option ${value === opt.value ? 'active' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function UserManagement() {
   const { hasRole } = useAuth();
@@ -14,7 +84,7 @@ export default function UserManagement() {
   const [error, setError] = useState('');
 
   const [showModal, setShowModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null); // null = mode tambah
+  const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -22,6 +92,7 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     setLoading(true);
     setError('');
+
     try {
       const { data } = await api.get('/users');
       setUsers(data.data);
@@ -45,17 +116,32 @@ export default function UserManagement() {
 
   const openEditModal = (user) => {
     setEditingUser(user);
-    setForm({ name: user.name, email: user.email, password: '', role: user.role, phone: user.phone || '' });
+    setForm({
+      name: user.name,
+      email: user.email,
+      password: '',
+      role: user.role,
+      phone: user.phone || '',
+    });
     setFormError('');
     setShowModal(true);
   };
 
-  const closeModal = () => setShowModal(false);
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
+
+    if (!form.role) {
+      setFormError('Role wajib dipilih');
+      return;
+    }
+
     setSaving(true);
+
     try {
       if (editingUser) {
         await api.put(`/users/${editingUser._id}`, {
@@ -66,6 +152,7 @@ export default function UserManagement() {
       } else {
         await api.post('/users', form);
       }
+
       setShowModal(false);
       fetchUsers();
     } catch (err) {
@@ -86,6 +173,7 @@ export default function UserManagement() {
 
   const handleDelete = async (user) => {
     if (!confirm(`Hapus karyawan "${user.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+
     try {
       await api.delete(`/users/${user._id}`);
       fetchUsers();
@@ -111,6 +199,7 @@ export default function UserManagement() {
         <span style={{ color: 'var(--color-muted)', fontSize: '0.88rem' }}>
           {users.length} karyawan terdaftar
         </span>
+
         {isAdmin && (
           <button className="btn-primary" style={{ width: 'auto' }} onClick={openAddModal}>
             + Tambah Karyawan
@@ -136,28 +225,37 @@ export default function UserManagement() {
                 {isAdmin && <th>Aksi</th>}
               </tr>
             </thead>
+
             <tbody>
               {users.map((u) => (
                 <tr key={u._id}>
                   <td>{u.name}</td>
-                  <td className="mono" style={{ fontSize: '0.85rem' }}>{u.email}</td>
+
+                  <td className="mono" style={{ fontSize: '0.85rem' }}>
+                    {u.email}
+                  </td>
+
                   <td>
                     <span className={badgeClassForRole(u.role)}>{u.role}</span>
                   </td>
+
                   <td>
                     <span className={`badge ${u.isActive ? 'badge-active' : 'badge-inactive'}`}>
                       {u.isActive ? 'Aktif' : 'Nonaktif'}
                     </span>
                   </td>
+
                   {isAdmin && (
                     <td>
                       <div className="row-actions">
                         <button className="btn-secondary" onClick={() => openEditModal(u)}>
                           Edit
                         </button>
+
                         <button className="btn-secondary" onClick={() => handleToggleActive(u)}>
                           {u.isActive ? 'Nonaktifkan' : 'Aktifkan'}
                         </button>
+
                         <button className="btn-danger" onClick={() => handleDelete(u)}>
                           Hapus
                         </button>
@@ -215,15 +313,17 @@ export default function UserManagement() {
               <div className="form-row">
                 <div className="form-field" style={{ flex: 1 }}>
                   <label>Role</label>
-                  <select
+                  <CustomSelect
                     value={form.role}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  >
-                    <option value="Kasir">Kasir</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Admin">Admin</option>
-                  </select>
+                    placeholder="Pilih role"
+                    options={ROLE_OPTIONS}
+                    onChange={(value) => {
+                      if (!value) return;
+                      setForm({ ...form, role: value });
+                    }}
+                  />
                 </div>
+
                 <div className="form-field" style={{ flex: 1 }}>
                   <label>No. Telepon</label>
                   <input
@@ -237,7 +337,13 @@ export default function UserManagement() {
                 <button type="button" className="btn-secondary" onClick={closeModal}>
                   Batal
                 </button>
-                <button type="submit" className="btn-primary" style={{ width: 'auto' }} disabled={saving}>
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{ width: 'auto' }}
+                  disabled={saving}
+                >
                   {saving ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
