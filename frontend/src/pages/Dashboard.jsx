@@ -1,6 +1,10 @@
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardData, getProdukTerlaris, getLabaRugi } from '../api/laporanApi';
+import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const QUICK_LINKS = [
   {
@@ -62,21 +66,107 @@ const QUICK_LINKS = [
 
 export default function Dashboard() {
   const { user, hasRole } = useAuth();
+  const [summary, setSummary] = useState(null);
+  const [topProducts, setTopProducts] = useState([]);
+  const [labaRugi, setLabaRugi] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [resSummary, resTop, resLaba] = await Promise.all([
+        getDashboardData(),
+        getProdukTerlaris(),
+        getLabaRugi(),
+      ]);
+
+      if (resSummary.success) setSummary(resSummary.data);
+      if (resTop.success) setTopProducts(resTop.data);
+      if (resLaba.success) setLabaRugi(resLaba.data);
+    } catch (error) {
+      console.error('Gagal memuat data dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatRupiah = (val) =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val || 0);
 
   return (
     <AppLayout>
       <div className="page-header">
         <div className="eyebrow">Ringkasan</div>
-        <h1>Selamat datang, {user?.name}</h1>
+        <h1>Selamat datang, {user?.nama || user?.name || 'User'}</h1>
       </div>
 
-      <div className="card" style={{ padding: 20, marginBottom: 24 }}>
-        <p style={{ margin: 0, color: 'var(--color-muted)', lineHeight: 1.6 }}>
-          Aplikasi POS ini sudah dilengkapi dengan modul <strong>Transaksi</strong> (Kasir). 
-          Anda dapat melakukan penjualan, melihat riwayat transaksi, dan mencetak struk.
-        </p>
+      {/* Ringkasan Cards (Modul Anggota 5) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
+          <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+            <DollarSign size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Total Omzet</p>
+            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : formatRupiah(summary?.omzet)}</h3>
+          </div>
+        </div>
+
+        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
+          <div className="p-3 bg-green-100 text-green-600 rounded-lg">
+            <ShoppingBag size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Total Transaksi</p>
+            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : summary?.totalTransaksi || 0}</h3>
+          </div>
+        </div>
+
+        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
+          <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+            <TrendingUp size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Laba Kotor</p>
+            <h3 className="text-lg font-bold text-gray-800">{loading ? '...' : formatRupiah(labaRugi?.labaKotor)}</h3>
+          </div>
+        </div>
+
+        <div className="p-4 bg-white rounded-xl shadow-sm border flex items-center space-x-4">
+          <div className="p-3 bg-amber-100 text-amber-600 rounded-lg">
+            <AlertTriangle size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Stok Menipis (≤5)</p>
+            <h3 className="text-lg font-bold text-amber-600">{loading ? '...' : summary?.lowStockProduk || 0} Produk</h3>
+          </div>
+        </div>
       </div>
 
+      {/* Grafik Top Produk (Modul Anggota 5) */}
+      <div className="p-5 bg-white rounded-xl shadow-sm border mb-8">
+        <h2 className="text-base font-semibold text-gray-800 mb-4">Top 10 Produk Terlaris</h2>
+        {topProducts.length > 0 ? (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={topProducts}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="nama" tick={{ fontSize: 12 }} />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="totalQty" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Terjual (Qty)" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-6">Belum ada data transaksi penjualan.</p>
+        )}
+      </div>
+
+      {/* Quick Links Navigasi Bawaan */}
+      <h2 className="text-lg font-bold text-gray-800 mb-4">Akses Cepat Menu</h2>
       <div
         style={{
           display: 'grid',
