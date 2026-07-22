@@ -6,7 +6,6 @@ const Produk = require("../models/Produk");
 // @access  Private (Admin, Manager)
 exports.getDashboardSummary = async (req, res) => {
   try {
-    // Total Omzet & Total Transaksi Selesai
     const totalPenjualan = await Transaksi.aggregate([
       { $match: { status: "selesai" } },
       {
@@ -21,15 +20,13 @@ exports.getDashboardSummary = async (req, res) => {
     const omzet = totalPenjualan[0]?.totalOmzet || 0;
     const totalTransaksi = totalPenjualan[0]?.totalTransaksi || 0;
 
-    // Total Produk Aktif & Stok Menipis (Stok <= 5)
     const totalProduk = await Produk.countDocuments({ aktif: true });
     const lowStockProduk = await Produk.countDocuments({ aktif: true, stok: { $lte: 5 } });
 
-    // 5 Transaksi Terakhir
     const recentTransactions = await Transaksi.find({ status: "selesai" })
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate("kasir", "nama email");
+      .populate("kasir", "name email");
 
     res.json({
       success: true,
@@ -62,7 +59,7 @@ exports.getLaporanPenjualan = async (req, res) => {
     }
 
     const transaksi = await Transaksi.find(query)
-      .populate("kasir", "nama")
+      .populate("kasir", "name")
       .sort({ createdAt: -1 });
 
     const totalOmzet = transaksi.reduce((acc, curr) => acc + curr.total, 0);
