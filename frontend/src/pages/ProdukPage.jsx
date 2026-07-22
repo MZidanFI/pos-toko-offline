@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import api from "../api/axiosConfig";
 import ProdukForm from "../components/ProdukForm";
 import AppLayout from "../components/AppLayout";
@@ -7,9 +7,79 @@ import { useAuth } from "../context/AuthContext";
 const IMG_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace("/api", "");
 
 const formatRupiah = (angka) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(
-    angka || 0
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(angka || 0);
+
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const selected = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="custom-select" ref={wrapperRef}>
+      <button
+        type="button"
+        className="custom-select-button"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className="custom-select-label">
+          {selected ? selected.label : placeholder}
+        </span>
+        <span className="custom-select-arrow">▾</span>
+      </button>
+
+      {open && (
+        <div className="custom-select-menu">
+          <button
+            type="button"
+            className={`custom-select-option empty ${!value ? "active" : ""}`}
+            onClick={() => {
+              onChange("");
+              setOpen(false);
+            }}
+          >
+            {placeholder}
+          </button>
+
+          {options.length === 0 ? (
+            <button type="button" className="custom-select-option" disabled>
+              Tidak ada data
+            </button>
+          ) : (
+            options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`custom-select-option ${value === opt.value ? "active" : ""}`}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
   );
+};
 
 export default function ProdukPage() {
   const { hasRole } = useAuth();
@@ -34,12 +104,14 @@ export default function ProdukPage() {
       api.get("/kategori"),
       api.get("/supplier"),
     ]);
-    setKategoriList(kategoriRes.data);
-    setSupplierList(supplierRes.data);
+
+    setKategoriList(Array.isArray(kategoriRes.data) ? kategoriRes.data : []);
+    setSupplierList(Array.isArray(supplierRes.data) ? supplierRes.data : []);
   }, []);
 
   const fetchProduk = useCallback(async () => {
     setLoading(true);
+
     try {
       const { data } = await api.get("/produk", {
         params: {
@@ -50,8 +122,9 @@ export default function ProdukPage() {
           limit: 10,
         },
       });
-      setProdukList(data.data);
-      setTotalPages(data.totalPages);
+
+      setProdukList(data.data || []);
+      setTotalPages(data.totalPages || 1);
     } finally {
       setLoading(false);
     }
@@ -87,16 +160,36 @@ export default function ProdukPage() {
     fetchProduk();
   };
 
+  const kategoriOptions = kategoriList.map((k) => ({
+    value: k._id,
+    label: k.nama,
+  }));
+
+  const supplierOptions = supplierList.map((s) => ({
+    value: s._id,
+    label: s.nama,
+  }));
+
   return (
     <AppLayout>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+      <div
+        className="page-header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
         <div>
           <div className="eyebrow">Master Data</div>
           <h1>Master Data Produk</h1>
           <p className="page-header-subtitle">Kelola produk yang dijual di toko</p>
         </div>
+
         {isAdmin && (
-          <button className="btn-primary" style={{ width: 'auto' }} onClick={openTambah}>
+          <button className="btn-primary" style={{ width: "auto" }} onClick={openTambah}>
             + Tambah Produk
           </button>
         )}
@@ -113,36 +206,30 @@ export default function ProdukPage() {
           }}
           className="text-input"
         />
-        <select
-          value={filterKategori}
-          onChange={(e) => {
-            setPage(1);
-            setFilterKategori(e.target.value);
-          }}
-          className="select-input"
-        >
-          <option value="">Semua Kategori</option>
-          {kategoriList.map((k) => (
-            <option key={k._id} value={k._id}>
-              {k.nama}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filterSupplier}
-          onChange={(e) => {
-            setPage(1);
-            setFilterSupplier(e.target.value);
-          }}
-          className="select-input"
-        >
-          <option value="">Semua Supplier</option>
-          {supplierList.map((s) => (
-            <option key={s._id} value={s._id}>
-              {s.nama}
-            </option>
-          ))}
-        </select>
+
+        <div style={{ minWidth: 180 }}>
+          <CustomSelect
+            value={filterKategori}
+            placeholder="Semua Kategori"
+            options={kategoriOptions}
+            onChange={(value) => {
+              setPage(1);
+              setFilterKategori(value);
+            }}
+          />
+        </div>
+
+        <div style={{ minWidth: 180 }}>
+          <CustomSelect
+            value={filterSupplier}
+            placeholder="Semua Supplier"
+            options={supplierOptions}
+            onChange={(value) => {
+              setPage(1);
+              setFilterSupplier(value);
+            }}
+          />
+        </div>
       </div>
 
       <div className="card">
@@ -165,6 +252,7 @@ export default function ProdukPage() {
                 {isAdmin && <th>Aksi</th>}
               </tr>
             </thead>
+
             <tbody>
               {produkList.map((p) => (
                 <tr key={p._id}>
@@ -177,13 +265,17 @@ export default function ProdukPage() {
                       )}
                     </div>
                   </td>
+
                   <td style={{ fontWeight: 600 }}>{p.nama}</td>
-                  <td className="mono" style={{ fontSize: '0.85rem' }}>{p.sku}</td>
+                  <td className="mono" style={{ fontSize: "0.85rem" }}>
+                    {p.sku}
+                  </td>
                   <td>{p.kategori?.nama || "-"}</td>
                   <td>{p.supplier?.nama || "-"}</td>
                   <td>{formatRupiah(p.hargaBeli)}</td>
                   <td>{formatRupiah(p.hargaJual)}</td>
                   <td>{p.stok}</td>
+
                   {isAdmin && (
                     <td>
                       <div className="row-actions">
@@ -206,6 +298,7 @@ export default function ProdukPage() {
           <span>
             Halaman {page} dari {totalPages}
           </span>
+
           <div className="pagination-controls">
             <button
               className="pagination-btn"
@@ -214,6 +307,7 @@ export default function ProdukPage() {
             >
               Sebelumnya
             </button>
+
             <button
               className="pagination-btn"
               disabled={page >= totalPages}

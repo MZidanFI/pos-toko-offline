@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  /* === Design tokens: tema "buku kas / receipt toko" === */
+  /* === Tema Kasirin: buku kas / receipt toko === */
   --color-bg: #faf6ef;
   --color-surface: #ffffff;
   --color-ink: #1c1c1a;
   --color-muted: #6b6560;
   --color-line: #e4ddd0;
+  --color-border: #e4ddd0;
 
-  --color-primary: #1f4b3f;      /* hijau tua ala buku kas / mesin kasir lama */
+  --color-primary: #1f4b3f;
   --color-primary-light: #2d6b58;
-  --color-accent: #e29a3d;       /* amber, warna "stempel lunas" */
+  --color-accent: #e29a3d;
   --color-accent-dark: #c07f27;
   --color-danger: #c1442e;
   --color-success: #2d6b48;
@@ -21,73 +22,19 @@
 
   --radius-sm: 6px;
   --radius-md: 10px;
-  --shadow-card: 0 1px 2px rgba(28, 28, 26, 0.04), 0 8px 24px rgba(28, 28, 26, 0.06);
+  --shadow-card:
+    0 1px 2px rgba(28, 28, 26, 0.04),
+    0 8px 24px rgba(28, 28, 26, 0.06);
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* === Fix: full-width grid kalau tidak ada form (non-admin) === */
-@media (min-width: 992px) {
-  .crud-grid.crud-grid-single {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* === Fix: header tabel jangan wrap jadi 2 baris === */
-.data-table thead th {
-  white-space: nowrap;
-}
-
-/* === Cetak Struk === */
-@media print {
-  @page {
-    margin: 12mm;
-  }
-
-  body {
-    margin: 0 !important;
-    background: #ffffff !important;
-  }
-
-  /* Sembunyikan seluruh aplikasi, sidebar, header, dan tombol */
-  body * {
-    visibility: hidden !important;
-  }
-
-  /* Hanya card struk yang ditampilkan */
-  .print-area,
-  .print-area * {
-    visibility: visible !important;
-  }
-
-  .print-area {
-    position: fixed !important;
-    top: 12mm !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-
-    width: 120mm !important;
-    max-width: calc(100vw - 24mm) !important;
-
-    margin: 0 !important;
-    padding: 6mm !important;
-
-    background: #ffffff !important;
-    box-shadow: none !important;
-    border: 1px solid #cfc8be !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-}
-
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -98,14 +45,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 button {
-  font-family: inherit;
+  cursor: pointer;
 }
 
 a {
@@ -124,13 +80,15 @@ a {
   clip: rect(0 0 0 0);
 }
 
-/* Focus visibility (aksesibilitas) */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* === Layout shell === */
+/* ================================================ */
+/* === Layout Utama                              === */
+/* ================================================ */
+
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -138,6 +96,7 @@ a {
 
 .sidebar {
   width: 240px;
+  flex-shrink: 0;
   background: var(--color-primary);
   color: #f2ede2;
   padding: 24px 18px;
@@ -147,19 +106,19 @@ a {
 }
 
 .sidebar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
   font-family: var(--font-display);
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
 }
 
 .sidebar-brand span {
+  color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--color-accent);
   font-weight: 500;
 }
 
@@ -175,10 +134,10 @@ a {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  text-decoration: none;
   color: #d8e6de;
   font-size: 0.92rem;
   font-weight: 500;
+  text-decoration: none;
   transition: background 0.15s ease;
 }
 
@@ -193,10 +152,10 @@ a {
 
 .sidebar-footer {
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 16px;
-  font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   color: #b9c9c0;
+  font-size: 0.85rem;
 }
 
 .sidebar-user {
@@ -208,37 +167,38 @@ a {
 
 .role-pill {
   align-self: flex-start;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   padding: 2px 8px;
   border-radius: 100px;
   background: rgba(226, 154, 61, 0.2);
   color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .logout-btn {
   width: 100%;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #f2ede2;
   padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-sm);
-  cursor: pointer;
+  background: transparent;
+  color: #f2ede2;
   font-size: 0.85rem;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .main-content {
   flex: 1;
-  padding: 32px 40px;
+  width: 100%;
   max-width: 1100px;
+  padding: 32px 40px;
 }
 
 .page-header {
@@ -246,84 +206,52 @@ a {
 }
 
 .page-header .eyebrow {
+  margin-bottom: 6px;
+  color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-muted);
-  margin-bottom: 6px;
 }
 
 .page-header h1 {
   font-size: 1.7rem;
 }
 
-/* === Card === */
+.page-header-subtitle {
+  margin: 5px 0 0;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+/* ================================================ */
+/* === Card                                      === */
+/* ================================================ */
+
 .card {
-  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
+  background: var(--color-surface);
   box-shadow: var(--shadow-card);
 }
 
-/* === Login page: kartu bergaya struk kasir === */
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-primary);
-  background-image: radial-gradient(circle at 20% 20%, rgba(226, 154, 61, 0.08), transparent 40%);
-  padding: 24px;
+.section-card {
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-.receipt-card {
-  width: 100%;
-  max-width: 380px;
-  background: var(--color-surface);
-  border-radius: 4px 4px var(--radius-md) var(--radius-md);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-  position: relative;
-  padding: 34px 30px 28px;
+.section-title {
+  margin-bottom: 16px;
+  font-size: 1.08rem;
 }
 
-.receipt-card::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 0;
-  right: 0;
-  height: 12px;
-  background-image: radial-gradient(circle, var(--color-primary) 6px, transparent 6.5px);
-  background-size: 20px 12px;
-  background-repeat: repeat-x;
-  background-position: center top;
+.table-card {
+  overflow: hidden;
 }
 
-.receipt-brand {
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-.receipt-brand .store-name {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.receipt-brand .store-tag {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.receipt-divider {
-  border: none;
-  border-top: 1px dashed var(--color-line);
-  margin: 20px 0;
-}
+/* ================================================ */
+/* === Form input / select / textarea            === */
+/* ================================================ */
 
 .form-field {
   margin-bottom: 16px;
@@ -331,105 +259,245 @@ a {
 
 .form-field label {
   display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
   margin-bottom: 6px;
   color: var(--color-ink);
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-.form-field input {
+.form-field input,
+.form-field select,
+.form-field textarea,
+.text-input,
+.select-input,
+.filter-input,
+.filter-select {
   width: 100%;
+  min-height: 42px;
   padding: 10px 12px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  font-family: var(--font-body);
   background: #fffdf9;
-  transition: border-color 0.15s ease;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.form-field input:focus {
+.form-field textarea {
+  min-height: auto;
+  resize: vertical;
+}
+
+.form-field select,
+.select-input,
+.filter-select {
+  cursor: pointer;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder,
+.text-input::placeholder,
+.filter-input::placeholder {
+  color: #918a82;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.text-input:focus,
+.select-input:focus,
+.filter-input:focus,
+.filter-select:focus {
   border-color: var(--color-primary);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 75, 63, 0.12);
 }
+
+.form-field input:focus-visible,
+.form-field select:focus-visible,
+.form-field textarea:focus-visible,
+.text-input:focus-visible,
+.select-input:focus-visible,
+.filter-input:focus-visible,
+.filter-select:focus-visible {
+  outline: none;
+}
+
+.form-field select option,
+.select-input option,
+.filter-select option {
+  background: #fffdf9;
+  color: var(--color-ink);
+}
+
+/* Browser tertentu mendukung warna option selected, browser Windows bisa berbeda */
+.form-field select option:checked,
+.select-input option:checked,
+.filter-select option:checked {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* ================================================ */
+/* === Tombol                                    === */
+/* ================================================ */
 
 .btn-primary {
   width: 100%;
   padding: 11px 14px;
-  background: var(--color-primary);
-  color: #fff;
   border: none;
   border-radius: var(--radius-sm);
-  font-weight: 600;
+  background: var(--color-primary);
+  color: #ffffff;
   font-size: 0.95rem;
-  cursor: pointer;
+  font-weight: 600;
   transition: background 0.15s ease, transform 0.05s ease;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--color-primary-light);
 }
 
-.btn-primary:active {
+.btn-primary:active:not(:disabled) {
   transform: scale(0.99);
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .btn-secondary {
   padding: 9px 14px;
-  background: transparent;
-  color: var(--color-primary);
   border: 1px solid var(--color-primary);
   border-radius: var(--radius-sm);
-  font-weight: 600;
+  background: transparent;
+  color: var(--color-primary);
   font-size: 0.88rem;
-  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: rgba(31, 75, 63, 0.07);
 }
 
 .btn-danger {
   padding: 6px 10px;
-  background: transparent;
-  color: var(--color-danger);
   border: 1px solid rgba(193, 68, 46, 0.4);
   border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-danger);
   font-size: 0.8rem;
-  cursor: pointer;
 }
 
 .btn-danger:hover {
   background: rgba(193, 68, 46, 0.08);
 }
 
-.error-banner {
-  background: rgba(193, 68, 46, 0.08);
-  border: 1px solid rgba(193, 68, 46, 0.3);
+.btn-link-danger {
+  padding: 0;
+  border: none;
+  background: none;
   color: var(--color-danger);
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  margin-bottom: 16px;
+  font-weight: 600;
 }
 
-.login-hint {
-  margin-top: 18px;
+.btn-link-danger:hover {
+  text-decoration: underline;
+}
+
+/* ================================================ */
+/* === Banner, Empty State, Badge                === */
+/* ================================================ */
+
+.error-banner {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(193, 68, 46, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(193, 68, 46, 0.08);
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.success-banner {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(45, 107, 72, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(45, 107, 72, 0.1);
+  color: var(--color-success);
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  padding: 40px 20px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
   text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 100px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background: rgba(31, 75, 63, 0.12);
+  color: var(--color-primary);
+}
+
+.badge-manager {
+  background: rgba(226, 154, 61, 0.15);
+  color: var(--color-accent-dark);
+}
+
+.badge-kasir {
+  background: #eee9dd;
   color: var(--color-muted);
 }
 
-/* === Tabel user management === */
+.badge-active,
+.badge-selesai,
+.badge-stock-in {
+  background: rgba(45, 107, 72, 0.12);
+  color: var(--color-success);
+}
+
+.badge-inactive,
+.badge-batal,
+.badge-stock-out {
+  background: rgba(193, 68, 46, 0.1);
+  color: var(--color-danger);
+}
+
+.badge-stock-adjustment {
+  background: rgba(226, 154, 61, 0.16);
+  color: var(--color-accent-dark);
+}
+
+/* ================================================ */
+/* === Tabel                                     === */
+/* ================================================ */
+
 .toolbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  gap: 12px;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 table.data-table {
@@ -439,14 +507,15 @@ table.data-table {
 }
 
 .data-table thead th {
-  text-align: left;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-muted);
   padding: 10px 16px;
   border-bottom: 1px solid var(--color-line);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .data-table tbody td {
@@ -455,86 +524,33 @@ table.data-table {
   vertical-align: middle;
 }
 
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .data-table tbody tr:hover {
   background: #fbf7ef;
 }
 
-.badge {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 100px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  font-family: var(--font-mono);
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
 }
 
-.badge-admin { background: rgba(31, 75, 63, 0.12); color: var(--color-primary); }
-.badge-manager { background: rgba(226, 154, 61, 0.15); color: var(--color-accent-dark); }
-.badge-kasir { background: #eee9dd; color: var(--color-muted); }
-
-.badge-active { background: rgba(45, 107, 72, 0.12); color: var(--color-success); }
-.badge-inactive { background: rgba(193, 68, 46, 0.1); color: var(--color-danger); }
+.table-scroll .data-table {
+  min-width: 620px;
+}
 
 .row-actions {
   display: flex;
   gap: 6px;
-}
-
-/* === Modal form === */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(28, 28, 26, 0.45);
-  display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 50;
-  padding: 20px;
 }
 
-.modal-box {
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  padding: 26px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: var(--shadow-card);
-}
+/* ================================================ */
+/* === Filter Master Data Produk                  === */
+/* ================================================ */
 
-.modal-box h2 {
-  font-size: 1.2rem;
-  margin-bottom: 18px;
-}
-
-.form-row {
-  display: flex;
-  gap: 12px;
-}
-
-.form-field select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  background: #fffdf9;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--color-muted);
-  font-size: 0.9rem;
-}
-
-/* === Filter bar (search & select filters) === */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -544,49 +560,31 @@ table.data-table {
 }
 
 .text-input,
-.select-input {
-  padding: 10px 12px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  background: #fffdf9;
-  transition: border-color 0.15s ease;
-}
-
-.text-input:focus,
-.select-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-}
-
-.text-input {
+.filter-input {
   flex: 1;
   min-width: 220px;
 }
 
-.select-input {
+.select-input,
+.filter-select {
+  width: auto;
   min-width: 160px;
 }
 
-/* === Page header subtitle === */
-.page-header-subtitle {
-  color: var(--color-muted);
-  font-size: 0.88rem;
-  margin-top: 4px;
-}
+/* ================================================ */
+/* === Thumbnail Produk                           === */
+/* ================================================ */
 
-/* === Table image thumbnail === */
 .table-thumb {
+  display: flex;
   width: 42px;
   height: 42px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--color-bg);
-  display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
 }
 
 .table-thumb img {
@@ -596,20 +594,23 @@ table.data-table {
 }
 
 .table-thumb-empty {
-  font-size: 0.6rem;
   color: var(--color-muted);
   font-family: var(--font-mono);
+  font-size: 0.6rem;
 }
 
-/* === Pagination === */
+/* ================================================ */
+/* === Pagination                                 === */
+/* ================================================ */
+
 .pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
   border-top: 1px solid var(--color-line);
-  font-size: 0.85rem;
   color: var(--color-muted);
+  font-size: 0.85rem;
 }
 
 .pagination-controls {
@@ -622,10 +623,8 @@ table.data-table {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 0.85rem;
-  cursor: pointer;
   color: var(--color-ink);
-  transition: background 0.15s ease;
+  font-size: 0.85rem;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -633,51 +632,32 @@ table.data-table {
 }
 
 .pagination-btn:disabled {
-  opacity: 0.4;
   cursor: not-allowed;
+  opacity: 0.4;
 }
 
-/* === CRUD grid (SimpleCrudManager: form + list) === */
+/* ================================================ */
+/* === SimpleCrudManager: Kategori / Supplier    === */
+/* ================================================ */
+
 .crud-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 }
 
-@media (min-width: 992px) {
-  .crud-grid {
-    grid-template-columns: 320px 1fr;
-  }
-}
-
 .crud-form-card {
-  background: var(--color-surface);
+  height: fit-content;
+  padding: 20px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
+  background: var(--color-surface);
   box-shadow: var(--shadow-card);
-  padding: 20px;
-  height: fit-content;
 }
 
 .crud-form-card h2 {
-  font-size: 1rem;
   margin-bottom: 14px;
-}
-
-.form-field textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  background: #fffdf9;
-  resize: vertical;
-}
-
-.form-field textarea:focus {
-  border-color: var(--color-primary);
-  outline: none;
+  font-size: 1rem;
 }
 
 .form-actions-inline {
@@ -691,38 +671,39 @@ table.data-table {
   width: auto;
 }
 
-/* === Badge status transaksi === */
-.badge-selesai { background: rgba(45, 107, 72, 0.12); color: var(--color-success); }
-.badge-batal { background: rgba(193, 68, 46, 0.1); color: var(--color-danger); }
+/* ================================================ */
+/* === Modal                                     === */
+/* ================================================ */
 
-.link-action {
-  color: var(--color-primary);
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-decoration: none;
+.modal-overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(28, 28, 26, 0.45);
 }
 
-.link-action:hover {
-  text-decoration: underline;
+.modal-box {
+  width: 100%;
+  max-width: 420px;
+  padding: 26px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
-.btn-link-danger {
-  background: none;
-  border: none;
-  color: var(--color-danger);
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 0;
+.modal-box h2 {
+  margin-bottom: 18px;
+  font-size: 1.2rem;
 }
 
-.btn-link-danger:hover {
-  text-decoration: underline;
-}
-
-/* === Modal produk (lebih lebar + grid 2 kolom) === */
 .modal-box-lg {
   max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -733,18 +714,28 @@ table.data-table {
 }
 
 .modal-close-btn {
-  background: none;
+  padding: 0 4px;
   border: none;
+  background: none;
+  color: var(--color-muted);
   font-size: 1.4rem;
   line-height: 1;
-  color: var(--color-muted);
-  cursor: pointer;
-  padding: 0 4px;
 }
 
 .modal-close-btn:hover {
   color: var(--color-ink);
 }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ================================================ */
+/* === Form Produk                                === */
+/* ================================================ */
 
 .form-grid-2 {
   display: grid;
@@ -756,25 +747,24 @@ table.data-table {
   grid-column: 1 / -1;
 }
 
-/* === Upload gambar produk === */
 .image-upload-row {
   display: flex;
-  gap: 16px;
   align-items: flex-start;
+  gap: 16px;
   margin-bottom: 18px;
 }
 
 .image-preview-box {
+  display: flex;
   width: 100px;
   height: 100px;
-  border-radius: var(--radius-md);
-  border: 1.5px dashed var(--color-line);
-  display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border: 1.5px dashed var(--color-line);
+  border-radius: var(--radius-md);
   background: var(--color-bg);
-  flex-shrink: 0;
 }
 
 .image-preview-box img {
@@ -784,19 +774,453 @@ table.data-table {
 }
 
 .image-preview-empty {
-  font-size: 0.7rem;
-  color: var(--color-muted);
-  text-align: center;
   padding: 0 8px;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  text-align: center;
 }
 
 .image-upload-hint {
-  font-size: 0.75rem;
-  color: var(--color-muted);
   margin-top: 6px;
+  color: var(--color-muted);
+  font-size: 0.75rem;
 }
 
 .file-input {
-  font-size: 0.85rem;
   width: 100%;
+  font-size: 0.85rem;
+}
+
+/* ================================================ */
+/* === Form Manajemen Stok                        === */
+/* ================================================ */
+
+.stock-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+}
+
+.stock-form-grid .form-field {
+  margin-bottom: 0;
+}
+
+.stock-submit {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.stock-submit .btn-primary {
+  width: auto;
+  min-width: 180px;
+}
+
+.stock-submit-btn {
+  width: auto;
+  height: 42px;
+}
+
+/* === Peringatan Stok Menipis === */
+
+.warning-card {
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border-color: rgba(226, 154, 61, 0.45);
+  background: #fff8e8;
+}
+
+.warning-card-title {
+  margin-bottom: 5px;
+  color: var(--color-accent-dark);
+  font-size: 1rem;
+}
+
+.warning-card-text {
+  margin: 0 0 10px;
+  color: var(--color-muted);
+  font-size: 0.86rem;
+}
+
+.warning-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--color-ink);
+  font-size: 0.88rem;
+}
+
+.warning-list li {
+  margin: 5px 0;
+}
+
+.warning-list span {
+  margin-left: 4px;
+  color: var(--color-muted);
+}
+
+/* ================================================ */
+/* === Form Customer                              === */
+/* ================================================ */
+
+.customer-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.customer-form .form-field {
+  margin-bottom: 0;
+}
+
+.customer-form-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.customer-form-actions .btn-primary,
+.customer-form-actions .btn-secondary {
+  width: auto;
+  white-space: nowrap;
+}
+
+/* ================================================ */
+/* === Custom Select Tema Kasirin                 === */
+/* ================================================ */
+
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-button {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: #fffdf9;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-select-button:hover {
+  border-color: rgba(31, 75, 63, 0.45);
+}
+
+.custom-select-button:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 75, 63, 0.12);
+}
+
+.custom-select-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.custom-select-arrow {
+  flex-shrink: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.custom-select-menu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 5px);
+  right: 0;
+  left: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: #fffdf9;
+  box-shadow: var(--shadow-card);
+}
+
+.custom-select-option {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: #fffdf9;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.custom-select-option:hover {
+  background: rgba(31, 75, 63, 0.08);
+}
+
+.custom-select-option.active {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.custom-select-option.empty {
+  color: var(--color-muted);
+}
+
+.custom-select-option:disabled {
+  cursor: not-allowed;
+  background: #f6f1e8;
+  color: var(--color-muted);
+}
+
+/* ================================================ */
+/* === Link aksi                                  === */
+/* ================================================ */
+
+.link-action {
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-action:hover {
+  text-decoration: underline;
+}
+
+/* ================================================ */
+/* === Login                                      === */
+/* ================================================ */
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-primary);
+  background-image: radial-gradient(
+    circle at 20% 20%,
+    rgba(226, 154, 61, 0.08),
+    transparent 40%
+  );
+}
+
+.receipt-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 34px 30px 28px;
+  border-radius: 4px 4px var(--radius-md) var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.receipt-card::before {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  left: 0;
+  height: 12px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-primary) 6px,
+    transparent 6.5px
+  );
+  background-position: center top;
+  background-repeat: repeat-x;
+  background-size: 20px 12px;
+  content: '';
+}
+
+.receipt-brand {
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.receipt-brand .store-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.receipt-brand .store-tag {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.receipt-divider {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px dashed var(--color-line);
+}
+
+.login-hint {
+  margin-top: 18px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+/* ================================================ */
+/* === Responsive                                 === */
+/* ================================================ */
+
+@media (min-width: 992px) {
+  .crud-grid {
+    grid-template-columns: 320px 1fr;
+  }
+
+  .crud-grid.crud-grid-single {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    padding: 28px 24px;
+  }
+
+  .stock-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customer-form-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 720px) {
+  .sidebar {
+    width: 210px;
+    padding: 20px 14px;
+  }
+
+  .main-content {
+    padding: 24px 18px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .image-upload-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .sidebar-footer {
+    margin-top: 12px;
+  }
+
+  .main-content {
+    padding: 24px 16px;
+  }
+
+  .stock-form-grid,
+  .customer-form {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-submit,
+  .customer-form-actions {
+    grid-column: 1;
+  }
+
+  .stock-submit .btn-primary,
+  .customer-form-actions .btn-primary,
+  .customer-form-actions .btn-secondary,
+  .stock-submit-btn {
+    width: 100%;
+  }
+
+  .customer-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+  }
+
+  .text-input,
+  .filter-input,
+  .select-input,
+  .filter-select {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+/* ================================================ */
+/* === Cetak Struk                                === */
+/* ================================================ */
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  body {
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
+    position: fixed !important;
+    top: 12mm !important;
+    left: 50% !important;
+    width: 120mm !important;
+    max-width: calc(100vw - 24mm) !important;
+    margin: 0 !important;
+    padding: 6mm !important;
+    transform: translateX(-50%) !important;
+    border: 1px solid #cfc8be !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }
