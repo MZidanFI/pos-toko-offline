@@ -7,7 +7,8 @@ const NAV_ITEMS = [
   { to: '/produk', label: 'Produk', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/kategori', label: 'Kategori', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/supplier', label: 'Supplier', roles: ['Admin', 'Manager', 'Kasir'] },
-  // Modul lain (Transaksi, Laporan) akan ditambahkan anggota tim lain
+  { to: '/laporan', label: 'Laporan', roles: ['Admin', 'Manager'] },
+  // Modul lain (Transaksi) akan ditambahkan anggota tim lain
 ];
 
 export default function AppLayout({ children }) {

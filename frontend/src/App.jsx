@@ -12,6 +12,7 @@ import RiwayatTransaksi from './pages/RiwayatTransaksi';
 import DetailTransaksi from './pages/DetailTransaksi';
 import StokPage from './pages/StokPage';
 import CustomerPage from "./pages/CustomerPage";
+import LaporanPage from './pages/LaporanPage';
 
 export default function App() {
   return (
@@ -100,14 +101,24 @@ export default function App() {
             }
           />
 
-          <Route path="/customers"
-          element={
-            <ProtectedRoute>
-              <CustomerPage />
-            </ProtectedRoute>}
-            />
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute>
+                <CustomerPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Modul lain (Transaksi, Laporan) ditambahkan di sini oleh anggota tim lain */}
+          {/* Route Laporan Penjualan*/}
+          <Route
+            path="/laporan"
+            element={
+              <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
+                <LaporanPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -48,6 +48,9 @@ app.use("/api/transaksi", transaksiRoutes);
 app.use('/api/stok', stokRoutes);
 app.use('/api/customers', customerRoutes);
 
+// Route Laporan & Dashboard (Anggota 5)
+app.use("/api/laporan", require("./routes/laporanRoutes"));
+
 // TODO: routes modul lain (transaksi, laporan) di-mount di sini oleh anggota tim lain
 
 // 404 handler
