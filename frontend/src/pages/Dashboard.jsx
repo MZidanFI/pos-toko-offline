@@ -46,6 +46,18 @@ const QUICK_LINKS = [
     desc: 'Kelola akun Admin, Manager & Kasir',
     roles: ['Admin', 'Manager'],
   },
+  {
+    to: '/stok',
+    label: 'Manajemen Stok',
+    desc: 'Kelola stok masuk, keluar, dan penyesuaian',
+    roles: ['Admin', 'Manager'],
+  },
+  {
+    to: '/customers',
+    label: 'Data Customer',
+    desc: 'Kelola data pelanggan dan poin loyalitas',
+    roles: ['Admin', 'Manager', 'Kasir'],
+  },
 ];
 
 export default function Dashboard() {
