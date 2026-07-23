@@ -69,6 +69,17 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
     }
 
+    if (
+      isActive !== undefined &&
+      isActive !== user.isActive &&
+      user._id.toString() === req.user._id.toString()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tidak bisa mengubah status aktif akun sendiri',
+      });
+    }
+
     if (name !== undefined) user.name = name;
     if (role !== undefined) user.role = role;
     if (phone !== undefined) user.phone = phone;
@@ -146,6 +157,13 @@ exports.toggleActive = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+    }
+
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tidak bisa menonaktifkan akun sendiri',
+      });
     }
 
     user.isActive = !user.isActive;

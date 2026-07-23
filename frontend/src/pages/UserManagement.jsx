@@ -27,7 +27,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+  
   return (
     <div className="custom-select" ref={wrapperRef}>
       <button
@@ -76,7 +76,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
 };
 
 export default function UserManagement() {
-  const { hasRole } = useAuth();
+  const { user: currentUser, hasRole } = useAuth();
   const isAdmin = hasRole('Admin');
 
   const [users, setUsers] = useState([]);
@@ -227,43 +227,64 @@ export default function UserManagement() {
             </thead>
 
             <tbody>
-              {users.map((u) => (
-                <tr key={u._id}>
-                  <td>{u.name}</td>
+              {users.map((u) => {
+                const isSelf = currentUser && u._id === currentUser._id;
 
-                  <td className="mono" style={{ fontSize: '0.85rem' }}>
-                    {u.email}
-                  </td>
-
-                  <td>
-                    <span className={badgeClassForRole(u.role)}>{u.role}</span>
-                  </td>
-
-                  <td>
-                    <span className={`badge ${u.isActive ? 'badge-active' : 'badge-inactive'}`}>
-                      {u.isActive ? 'Aktif' : 'Nonaktif'}
-                    </span>
-                  </td>
-
-                  {isAdmin && (
+                return (
+                  <tr key={u._id}>
                     <td>
-                      <div className="row-actions">
-                        <button className="btn-secondary" onClick={() => openEditModal(u)}>
-                          Edit
-                        </button>
-
-                        <button className="btn-secondary" onClick={() => handleToggleActive(u)}>
-                          {u.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                        </button>
-
-                        <button className="btn-danger" onClick={() => handleDelete(u)}>
-                          Hapus
-                        </button>
-                      </div>
+                      {u.name}
+                      {isSelf && (
+                        <span style={{ color: 'var(--color-muted)', fontSize: '0.8rem' }}>
+                          {' '}
+                        </span>
+                      )}
                     </td>
-                  )}
-                </tr>
-              ))}
+
+                    <td className="mono" style={{ fontSize: '0.85rem' }}>
+                      {u.email}
+                    </td>
+
+                    <td>
+                      <span className={badgeClassForRole(u.role)}>{u.role}</span>
+                    </td>
+
+                    <td>
+                      <span className={`badge ${u.isActive ? 'badge-active' : 'badge-inactive'}`}>
+                        {u.isActive ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    </td>
+
+                    {isAdmin && (
+                      <td>
+                        <div className="row-actions">
+                          <button className="btn-secondary" onClick={() => openEditModal(u)}>
+                            Edit
+                          </button>
+
+                          <button
+                            className="btn-secondary"
+                            onClick={() => handleToggleActive(u)}
+                            disabled={isSelf}
+                            title={isSelf ? 'Tidak bisa menonaktifkan akun sendiri' : ''}
+                          >
+                            {u.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                          </button>
+
+                          <button
+                            className="btn-danger"
+                            onClick={() => handleDelete(u)}
+                            disabled={isSelf}
+                            title={isSelf ? 'Tidak bisa menghapus akun sendiri' : ''}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
