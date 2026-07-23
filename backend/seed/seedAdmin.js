@@ -9,20 +9,20 @@ const run = async () => {
 
   const existing = await User.findOne({ email: 'admin@toko.com' });
   if (existing) {
-    console.log('⚠️  Admin sudah ada, seeding dilewati.');
+    console.log('Admin sudah ada, seeding dilewati.');
     process.exit(0);
   }
 
   await User.create({
     name: 'Administrator',
     email: 'admin@toko.com',
-    password: 'admin123', // ganti setelah login pertama kali!
+    password: 'admin123', 
     role: 'Admin',
   });
 
-  console.log('✅ Akun Admin berhasil dibuat:');
-  console.log('   email: admin@toko.com');
-  console.log('   password: admin123');
+  console.log('Akun Admin berhasil dibuat:');
+  console.log('email: admin@toko.com');
+  console.log('password: admin123');
   process.exit(0);
 };
 

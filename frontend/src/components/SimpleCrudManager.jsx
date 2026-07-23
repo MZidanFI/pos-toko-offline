@@ -26,7 +26,6 @@ export default function SimpleCrudManager({ title, subtitle, endpoint, fields })
   useEffect(() => {
     setForm(emptyForm());
     fetchItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchItems]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });

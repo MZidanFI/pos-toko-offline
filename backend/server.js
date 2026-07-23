@@ -13,7 +13,7 @@ const produkRoutes = require('./routes/produkRoutes');
 const kategoriRoutes = require('./routes/kategoriRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const transaksiRoutes = require("./routes/transaksiRoutes");
-const stokRoutes = require("./routes/stokRoutes"); // Import routes stok
+const stokRoutes = require("./routes/stokRoutes");
 
 connectDB();
 
@@ -41,6 +41,7 @@ app.use('/api/produk', produkRoutes);
 app.use('/api/kategori', kategoriRoutes);
 app.use('/api/supplier', supplierRoutes);
 
+// Routes Anggota 3: Transaksi Penjualan & Pembelian
 app.use("/api/transaksi", transaksiRoutes);
 
 // Routes Anggota 4: Manajemen Stok & Customer
@@ -49,15 +50,11 @@ app.use('/api/stok', stokRoutes);
 // Route Laporan & Dashboard (Anggota 5)
 app.use("/api/laporan", require("./routes/laporanRoutes"));
 
-// TODO: routes modul lain (transaksi, laporan) di-mount di sini oleh anggota tim lain
-
-// 404 handler
 app.use(notFound);
 
-// Global error handler
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+  console.log(`Server berjalan di http://localhost:${PORT}`);
 });
