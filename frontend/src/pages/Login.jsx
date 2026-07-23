@@ -72,7 +72,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="login-hint">akun default: admin@toko.com / admin123</div>
+        
       </div>
     </div>
   );
