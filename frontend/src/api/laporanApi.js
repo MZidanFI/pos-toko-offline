@@ -21,3 +21,6 @@ export const getLabaRugi = async () => {
   const response = await axiosInstance.get("/laporan/laba-rugi");
   return response.data;
 };
+
+export const getLowStockProduk = () => 
+  axiosInstance.get('/stok/low-stock').then(res => res.data);

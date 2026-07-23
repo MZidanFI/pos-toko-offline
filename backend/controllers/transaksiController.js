@@ -16,7 +16,7 @@ const generateNomorStruk = async (session) => {
     { $inc: { seq: 1 } },
     { new: true, upsert: true, session }
   );
-
+  
   const urutan = String(counter.seq).padStart(4, "0");
   return `TRX-${tanggal}-${urutan}`;
 };

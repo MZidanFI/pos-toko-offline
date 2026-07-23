@@ -15,6 +15,6 @@ router.route("/")
   .get(getStok) // Melihat histori stok
   .post(authorize("Admin", "Manager", "Kasir"), catatStok); // Mencatat stok masuk/keluar/adj
 
-router.get("/low-stock", getLowStockAlert); // Notifikasi stok menipis
+router.get("/low-stock", protect, getLowStockAlert); // Notifikasi stok menipis
 
 module.exports = router;
