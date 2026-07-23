@@ -50,6 +50,16 @@ exports.createUser = async (req, res) => {
       return res.status(409).json({ success: false, message: 'Email sudah terdaftar' });
     }
 
+    if (role === 'Admin') {
+      const existingAdmin = await User.findOne({ role: 'Admin' });
+      if (existingAdmin) {
+        return res.status(400).json({
+          success: false,
+          message: 'Hanya boleh ada satu akun Admin',
+        });
+      }
+    }
+
     const user = await User.create({ name, email, password, role, phone });
     res.status(201).json({ success: true, message: 'Karyawan berhasil ditambahkan', data: user });
   } catch (err) {
@@ -69,15 +79,30 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
     }
 
-    if (
-      isActive !== undefined &&
-      isActive !== user.isActive &&
-      user._id.toString() === req.user._id.toString()
-    ) {
+    const isSelf = user._id.toString() === req.user._id.toString();
+
+    if (role !== undefined && role !== user.role && isSelf) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tidak bisa mengubah role akun sendiri',
+      });
+    }
+
+    if (isActive !== undefined && isActive !== user.isActive && isSelf) {
       return res.status(400).json({
         success: false,
         message: 'Tidak bisa mengubah status aktif akun sendiri',
       });
+    }
+
+    if (role !== undefined && role === 'Admin' && user.role !== 'Admin') {
+      const existingAdmin = await User.findOne({ role: 'Admin' });
+      if (existingAdmin) {
+        return res.status(400).json({
+          success: false,
+          message: 'Hanya boleh ada satu akun Admin',
+        });
+      }
     }
 
     if (name !== undefined) user.name = name;

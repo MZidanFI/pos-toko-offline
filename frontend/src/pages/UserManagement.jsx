@@ -11,7 +11,7 @@ const ROLE_OPTIONS = [
   { value: 'Admin', label: 'Admin' },
 ];
 
-const CustomSelect = ({ value, onChange, options, placeholder }) => {
+const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
 
@@ -27,13 +27,15 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   return (
     <div className="custom-select" ref={wrapperRef}>
       <button
         type="button"
         className="custom-select-button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => !disabled && setOpen((prev) => !prev)}
+        disabled={disabled}
+        title={disabled ? 'Tidak bisa mengubah role akun sendiri' : ''}
       >
         <span className="custom-select-label">
           {selected ? selected.label : placeholder}
@@ -236,7 +238,7 @@ export default function UserManagement() {
                       {u.name}
                       {isSelf && (
                         <span style={{ color: 'var(--color-muted)', fontSize: '0.8rem' }}>
-                          {' '}
+                          {' '}(Anda)
                         </span>
                       )}
                     </td>
@@ -262,23 +264,23 @@ export default function UserManagement() {
                             Edit
                           </button>
 
-                          <button
-                            className="btn-secondary"
-                            onClick={() => handleToggleActive(u)}
-                            disabled={isSelf}
-                            title={isSelf ? 'Tidak bisa menonaktifkan akun sendiri' : ''}
-                          >
-                            {u.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                          </button>
+                          {!isSelf && (
+                            <button
+                              className="btn-secondary"
+                              onClick={() => handleToggleActive(u)}
+                            >
+                              {u.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                            </button>
+                          )}
 
-                          <button
-                            className="btn-danger"
-                            onClick={() => handleDelete(u)}
-                            disabled={isSelf}
-                            title={isSelf ? 'Tidak bisa menghapus akun sendiri' : ''}
-                          >
-                            Hapus
-                          </button>
+                          {!isSelf && (
+                            <button
+                              className="btn-danger"
+                              onClick={() => handleDelete(u)}
+                            >
+                              Hapus
+                            </button>
+                          )}
                         </div>
                       </td>
                     )}
@@ -338,6 +340,7 @@ export default function UserManagement() {
                     value={form.role}
                     placeholder="Pilih role"
                     options={ROLE_OPTIONS}
+                    disabled={editingUser && currentUser && editingUser._id === currentUser._id}
                     onChange={(value) => {
                       if (!value) return;
                       setForm({ ...form, role: value });
