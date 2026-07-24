@@ -53,8 +53,6 @@ const catatStok = async (req, res) => {
 // @desc    Cek Produk dengan Stok Menipis (Low Stock Warning)
 // @route   GET /api/stok/low-stock
 const getLowStockAlert = async (req, res) => {
-  // Karena field minStok belum ada, kita gunakan batas statis (misal: 5)
-  // Anda bisa mengganti angka 5 ini sesuai keinginan Anda
   const batasStokMenipis = 5; 
   
   const lowProducts = await Produk.find({ stok: { $lte: batasStokMenipis } });

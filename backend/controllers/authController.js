@@ -8,8 +8,6 @@ const {
 
 // @route  POST /api/auth/register
 // @desc   Registrasi user baru
-// @access Public (untuk demo). Di produksi, sebaiknya dibatasi hanya Admin
-//         yang bisa mendaftarkan kasir/manager baru lewat /api/users
 exports.register = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -49,7 +47,6 @@ exports.register = async (req, res) => {
 
 // @route  POST /api/auth/login
 // @desc   Login user, mengembalikan JWT
-// @access Public
 exports.login = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -97,7 +94,6 @@ exports.login = async (req, res) => {
 
 // @route  POST /api/auth/refresh
 // @desc   Ambil access token baru menggunakan refresh token
-// @access Public (butuh refresh token valid)
 exports.refresh = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -130,7 +126,6 @@ exports.refresh = async (req, res) => {
 
 // @route  GET /api/auth/me
 // @desc   Ambil data user yang sedang login
-// @access Private
 exports.getMe = async (req, res) => {
   res.json({ success: true, data: req.user });
 };

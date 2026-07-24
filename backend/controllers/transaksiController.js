@@ -140,7 +140,7 @@ const createTransaksi = async (req, res) => {
       metodePembayaran,
       jumlahBayar,
       kembalian,
-      kasir: req.user._id, // sesuaikan dengan middleware auth
+      kasir: req.user._id, 
       catatan,
     });
 
