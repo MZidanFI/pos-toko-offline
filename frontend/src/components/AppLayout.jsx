@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { to: '/kategori', label: 'Kategori', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/supplier', label: 'Supplier', roles: ['Admin', 'Manager', 'Kasir'] },
   { to: '/laporan', label: 'Laporan', roles: ['Admin', 'Manager'] },
-  { to: '/stok', label: 'Manajemen Stok', roles: ['Admin', 'Manager', 'Kasir'] },
+  { to: '/stok', label: 'Manajemen Stok', roles: ['Admin', 'Manager'] },
 ];
 
 export default function AppLayout({ children }) {
